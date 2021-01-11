@@ -9,6 +9,9 @@
     - [Javascript Engine](#javascript-engine)
         - [Interpreters X Compilers](#interpreters-x-compilers)
         - [Writing Optimized Code](#writing-optimized-code)
+        - [Call Stack and Memory Heap](#call-stack-and-memory-heap)
+        - [Garbage Collection](#garbage-collection)
+        - [Single Threaded language](#single-threaded-language)
 
 ### Javascript Engine
 
@@ -96,3 +99,35 @@ obj2.a = 100
 ```
 
 WebAssembly (Standard Binary Executable Format) is an executable format that all major browsers agrees on. So it runs really fast on the browser instead of having to go through that entire JS engine process.
+
+##### Call Stack and Memory Heap
+
+[Summary](#summary)
+
+We need the Memory Heap as a place to store information. Where the memory allocation happens.
+We use the call stack as a way to keep track where we are on the code, so we can run the code in order. Where the engine keeps track of where your code is in its execution.
+
+Stack Overflow happens when the call stack size is exceeded.
+
+##### Garbage Collection
+
+[Summary](#summary)
+
+JS is a garbage collected language. In other words, when JS realize we are not using the data, the garbage collector will free up the memory.
+
+Memory Leaks happen when we forget to clean up the code and the garbage collector don't reach that specific code in order to free it up. The most common ways this happens:
+- Global Variables
+- Event Listeners - you add new ones and never clean up when you don't need anymore
+- SetTimeout and SetInterval - the objects inside them are never going to get collected
+
+##### Single Threaded language
+
+[Summary](#summary)
+
+JS is a single thread language, so the code runs line by line. And because of that JS is synchronous. 
+
+[The JS Runtime](https://www.youtube.com/watch?v=8aGhZQkoFbQ&feature=emb_title)
+
+[JS Runtime Playground](http://latentflip.com/loupe/?code=ZnVuY3Rpb24gcHJpbnRIZWxsbygpIHsNCiAgICBjb25zb2xlLmxvZygnSGVsbG8gZnJvbSBiYXonKTsNCn0NCg0KZnVuY3Rpb24gYmF6KCkgew0KICAgIHNldFRpbWVvdXQocHJpbnRIZWxsbywgMzAwMCk7DQp9DQoNCmZ1bmN0aW9uIGJhcigpIHsNCiAgICBiYXooKTsNCn0NCg0KZnVuY3Rpb24gZm9vKCkgew0KICAgIGJhcigpOw0KfQ0KDQpmb28oKTs%3D!!!PGJ1dHRvbj5DbGljayBtZSE8L2J1dHRvbj4%3D)
+
+NodeJs is a JS runtime built on V8 JS Engine. It was created to run JS in the computer, so you don't need to run in the browser. It makes JS non-blocking because it sends the code to the event loop that is running on the background.
