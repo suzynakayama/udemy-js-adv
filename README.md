@@ -12,6 +12,11 @@
         - [Call Stack and Memory Heap](#call-stack-and-memory-heap)
         - [Garbage Collection](#garbage-collection)
         - [Single Threaded language](#single-threaded-language)
+    - [Execution context](#execution-context)
+        - [Lexical Environment](#lexical-environment)
+        - [Hoisting](#hoisting)
+    - [Function Call](#function-call)
+        - [Variable/Local Environment](#variablelocal-environment)
 
 ### Javascript Engine
 
@@ -131,3 +136,116 @@ JS is a single thread language, so the code runs line by line. And because of th
 [JS Runtime Playground](http://latentflip.com/loupe/?code=ZnVuY3Rpb24gcHJpbnRIZWxsbygpIHsNCiAgICBjb25zb2xlLmxvZygnSGVsbG8gZnJvbSBiYXonKTsNCn0NCg0KZnVuY3Rpb24gYmF6KCkgew0KICAgIHNldFRpbWVvdXQocHJpbnRIZWxsbywgMzAwMCk7DQp9DQoNCmZ1bmN0aW9uIGJhcigpIHsNCiAgICBiYXooKTsNCn0NCg0KZnVuY3Rpb24gZm9vKCkgew0KICAgIGJhcigpOw0KfQ0KDQpmb28oKTs%3D!!!PGJ1dHRvbj5DbGljayBtZSE8L2J1dHRvbj4%3D)
 
 NodeJs is a JS runtime built on V8 JS Engine. It was created to run JS in the computer, so you don't need to run in the browser. It makes JS non-blocking because it sends the code to the event loop that is running on the background.
+
+### Execution context
+
+[Summary](#summary)
+
+Every time we run JS code it is run inside and Execution Context.
+
+On the first phase, the Global Execution Context give us a`Global Object` and the `this`. And they are equal to one another initially. In this phase, we also have `hoisting`.
+
+On the second phase, a new Execution Context is created to run our code.
+
+##### Lexical Environment
+
+[Summary](#summary)
+
+It means where is the code written? Ex.
+
+```javascript
+function hi(){
+    return 'Hi'
+}
+
+function sayHi() {
+    function inside() {
+        return 'I am inside!'
+    }
+    return hi()
+}
+
+function bePolite() {
+    return sayHi()
+}
+
+bePolite()
+
+// In this example we can see that functions: hi, sayHi, and bePolite, were written in the global environment. While function inside was written within the sayHi environment.
+```
+
+Think about little worlds (each function), where each world is a lexical environment.
+
+![Lexical Environment](lexical-env.png)
+
+In JS, our lexical scope/environment (available data + variables where the function was defined) determines our available variables. Not where the function is called (dynamic scope).
+
+The very first lexical environment that we have is the global environment.
+
+##### Hoisting
+
+[Summary](#summary)
+
+Is the behavior of moving the functions declarations/variables to the top of their respective environments during compilation phase. Variables are partially hoisted (we hoist the variables defined with **var** * but assign undefined) and function declarations are hoisted.
+
+*\* variables and functions defined with **let** or **const** are not hoisted.*
+
+Interesting Example:
+```javascript
+// hoisted:
+// var favoriteFood = undefined;
+// var foodThoughts = undefined;
+
+var favoriteFood = 'grapes';
+
+var foodThoughts = function () {
+    //hoisted:
+    // var favoriteFood = undefined
+
+    console.log('Original favorite food: ' + favoriteFood);
+
+    var favoriteFood = 'sushi';
+
+    console.log('New favorite food: ' + favoriteFood);
+}
+
+// logs:
+// Original favorite food: undefined
+// New favorite food: sushi
+// undefined            * because the function doesn't have a return statement
+```
+
+### Function Call
+
+[Summary](#summary)
+
+Function declaration: `function x() {...}`
+Function Expression: `const x = () => {}`
+
+Function Invocation/Call/Execution - just run the function and creates an execution context with:
+- `this`
+- `arguments`
+
+The `arguments` keyword is a special keyword in JS.
+
+```javascript
+const marry = (p1, p2) => {
+    console.log('arguments: ' + arguments)
+    return `${p1} married ${p2}!`
+}
+
+marry('John', 'Jane')
+// arguments: {0: 'John', 1: 'Jane'}
+// John married Jane!
+```
+
+Within the Function Execution Context, we also have the Variable/Local Environment.
+
+##### Variable/Local Environment
+
+[Summary](#summary)
+
+Is the local environment within an execution context. For example, the local environment within a function.
+
+
+
