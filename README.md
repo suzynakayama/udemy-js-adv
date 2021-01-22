@@ -17,6 +17,12 @@
         - [Hoisting](#hoisting)
     - [Function Call](#function-call)
         - [Variable/Local Environment](#variablelocal-environment)
+    - [Function vs Block Scope](#function-vs-block-scope)
+    - [IIFE (Immediately Invoked Function Expression)](#iife-immediately-invoked-function-expression)
+    - [This](#this)
+          - [Bind, Apply, Call](#bind-apply-call)
+          - [Currying and Bind](#currying-and-bind)
+        - [Scope vs Context](#scope-vs-context)
 
 ### Javascript Engine
 
@@ -247,5 +253,165 @@ Within the Function Execution Context, we also have the Variable/Local Environme
 
 Is the local environment within an execution context. For example, the local environment within a function.
 
+### Function vs Block Scope
+
+[Summary](#summary)
+
+Function scope is the lexical environment inside the function.
+
+Block scope, on the other hand, is the lexical environment within a block of code with `{}`.
+
+In JS, you can create the block scope using `const` and `let` for variable declaration.
+
+### IIFE (Immediately Invoked Function Expression)
+
+[Summary](#summary)
+
+An IIFE is a anonymous function expression that is immediately invoked after being created.
+
+```javascript
+(function() {
+    // do something
+})()
+```
+
+So, why use IIFE? It will create a new execution environment, so you won't have a problem with scope and will minimize the amount of data that we add to the global environment.
+
+### This
+
+[Summary](#summary)
+
+`this` is the object that the function is a property of.
+
+In the global object, `this` is the global object. Ex. in the browser it is the `window`.
+
+If we have a function in the global object, `this` will still be the global object. Ex. `function a() {console.log(this)}`
+
+If you use `use strict` the `this` inside the function will be undefined.
+
+`this` within an object, will be the object.
+
+`this` is what is left to the dot.
+
+```javascript
+const myObj = {
+    name: 'Suzy',
+    sing() { 
+        return 'alalala ' + this.name
+    }
+    singAgain() { 
+        return this.sing() = '!'
+    }
+}
+
+myObj.sing()    // alalala Suzy
+```
+
+So, `this` has 2 main benefits:
+- gives methods access to their object (example above)
+- execute same code for multiple objects (example below)
+
+```javascript
+const importantPerson = () => {
+    console.log(this.name + '!')
+}
+
+importantPerson()   // == window.importantPerson() ==> this is window
+
+const name = 'Sunny';
+const obj1 = {
+    name: 'Suzy',
+    importantPerson: importantPerson
+}
+
+const obj2 = {
+    name: 'Pedro',
+    importantPerson: importantPerson
+}
+
+importantPerson()           // Sunny!
+obj1.importantPerson()      // Suzy!
+obj2.importantPerson()      // Pedro!
+
+
+
+// Another example
+const a = () => {
+    console.log('a', this);
+    const b = () => {
+        console.log('b', this);
+        const c = {
+            hi: () => console.log('c', this),
+        }
+        c.hi()
+    }
+    b()
+}
+
+a()
+// a window     ==> window.a()
+// b window     ==> window.a(b())
+// c {hi: f}    ==> c.hi()
+```
+
+Within an object, always use arrow function to bind this to the object. On the old days, we used to use `.bind(this)` to do this biding. We could also create a variable (self) and define it as `this`. Then use the self variable, instead of `this`.
+
+###### Bind, Apply, Call
+
+[Summary](#summary)
+
+`call` and `apply` do the same thing, it just calls the function. The only difference it that, when passing parameters, `apply` takes an array, instead of just parameters.
+
+`bind` binds the this keyword to the object and allows us to store the function for a later use.
+
+```javascript
+const wizard = {
+    name: 'Merlin',
+    health: 50,
+    heal(num1 = 50, num2 = 50) {
+        return this.health = num1 + num2;
+    }
+}
+
+const archer = {
+    name: 'Robin Hood',
+    health: 30
+}
+
+console.log('1', archer.health)     //1 30
+wizard.heal()       // 100
+wizard.heal.call(archer)
+console.log('2', archer.health)     //2 100
+wizard.heal.call(archer, 45, 35)
+console.log('3', archer.health)     //3 80
+
+wizard.heal.apply(archer, [45, 35])
+
+const healArcher = wizard.heal.bind(archer, 45, 35)
+healArcher()        // 80
+```
+
+###### Currying and Bind
+
+[Summary](#summary)
+
+Refers to only partially getting a parameter to a function and save it to use later.
+
+```javascript
+const multiply = (a,b) => a * b;
+
+let multiplyBy2 = multiply.bind(this, 2)
+
+console.log(multiplyBy2(4))     // 8
+```
+
+##### Scope vs Context
+
+[Summary](#summary)
+
+
+
+Scope is a function base thing, what is the variable access when it is invoked. Where is the variable environment. It's about the visibility of variables.
+Context is about the object. What is the value of the `this` keyword. Usually determined by how is the function invoked with the value of `this`.
 
 
