@@ -23,6 +23,10 @@
           - [Bind, Apply, Call](#bind-apply-call)
           - [Currying and Bind](#currying-and-bind)
         - [Scope vs Context](#scope-vs-context)
+    - [JS Types](#js-types)
+        - [Pass By Value vs Pass By Reference](#pass-by-value-vs-pass-by-reference)
+        - [Type Coercion](#type-coercion)
+        - [Dynamic vs Static and Strong vs Weak Languages](#dynamic-vs-static-and-strong-vs-weak-languages)
 
 ### Javascript Engine
 
@@ -409,9 +413,93 @@ console.log(multiplyBy2(4))     // 8
 
 [Summary](#summary)
 
-
-
 Scope is a function base thing, what is the variable access when it is invoked. Where is the variable environment. It's about the visibility of variables.
 Context is about the object. What is the value of the `this` keyword. Usually determined by how is the function invoked with the value of `this`.
 
+### JS Types
+
+[Summary](#summary)
+
+1. Number
+2. Boolean
+3. String
+4. Undefined
+5. Null
+6. Symbol('just me')
+7. Object
+   1. Array - to check if variable is an array use: `Array.isArray(variable)`
+   2. Function
+
+##### Pass By Value vs Pass By Reference
+
+[Summary](#summary)
+
+Primitive types are immutable. Ex. `let a = 10`
+
+Objects are pass by reference. They pass the reference in memory from that object.
+
+To create copies of objects without using the reference:
+```javascript
+let obj = {a:'a', b:'b'};
+let clone = Object.assign({}, obj);
+let clone2 = {...obj}
+
+obj.b = 5
+console.log(obj)        // {a:'a', b:5}
+console.log(clone)      // {a:'a', b:'b'}
+console.log(clone2)     // {a:'a', b:'b'}
+``` 
+
+NOTE: these options above are only shallow clones. If you have ??, you should do a deep clone, you can do that using JSON or a library. Be careful with deep cloning because it can take a long time.
+
+```javascript
+let obj = {a:'a', b:'b', c: {deep: 'hahaha'}};
+let clone = Object.assign({}, obj);
+let clone2 = {...obj}
+clone.c.deep = 'different'
+
+let superClone = JSON.parse(JSON.stringify(obj))
+
+obj.b = 5
+console.log(obj)        // {a:'a', b:5, c: {deep: 'different'}}
+console.log(clone)      // {a:'a', b:'b', c: {deep: 'different'}}
+console.log(clone2)     // {a:'a', b:'b', c: {deep: 'different'}}
+```
+
+Exercise: How would you compare two objects if they are pointing to a different location in memory but still have the same properties?
+
+```javascript
+var user1 = {name : "nerd", org: "dev"};
+var user2 = {name : "nerd", org: "dev"};
+
+var eq = user1 == user2;
+console.log(eq); // gives false
+
+// the below only works if the properties are in order
+var eq1 = JSON.stringify(obj1) === JSON.stringify(obj2) 
+console.log(eq1); // gives true
+```
+
+##### Type Coercion
+
+[Summary](#summary)
+
+Means the language converting the variable from one type to another.
+
+[JS Equality Table](https://dorey.github.io/JavaScript-Equality-Table/)
+[mdn](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness)
+
+##### Dynamic vs Static and Strong vs Weak Languages
+
+[Summary](#summary)
+
+![typed languages](images/typed-lang.png)
+
+**Dynamic** typed language allows us not to declare the type of variable. Ex. `let a = 100;`
+
+**Static** languages forces us to declare the type of the variable. `let a: number = 100;`
+
+**Weak** language is a language that has type coercion. So, for example, if we are using JS and try to add a string to a number, it will transform the number into a string and add to the end of the original string.
+
+**Strong** languages don't allow coercion. So in python, for example, if you try the same as the example above, it will return a error.
 
