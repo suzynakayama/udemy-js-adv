@@ -27,6 +27,11 @@
         - [Pass By Value vs Pass By Reference](#pass-by-value-vs-pass-by-reference)
         - [Type Coercion](#type-coercion)
         - [Dynamic vs Static and Strong vs Weak Languages](#dynamic-vs-static-and-strong-vs-weak-languages)
+    - [Functions vs Objects](#functions-vs-objects)
+      - [Higher Order Functions](#higher-order-functions)
+    - [Closures](#closures)
+          - [Memory Efficiency from closures](#memory-efficiency-from-closures)
+          - [Encapsulation](#encapsulation)
 
 ### Javascript Engine
 
@@ -502,4 +507,230 @@ Means the language converting the variable from one type to another.
 **Weak** language is a language that has type coercion. So, for example, if we are using JS and try to add a string to a number, it will transform the number into a string and add to the end of the original string.
 
 **Strong** languages don't allow coercion. So in python, for example, if you try the same as the example above, it will return a error.
+
+### Functions vs Objects
+
+[Summary](#summary)
+
+Arrays and Functions in JS are objects. Functions are special objects, they are callable objects. When we invoke a function we get 2 parameters (`this` and `arguments`).
+
+Ways to invoke a function:
+- call it as a regular function
+- as a method - function inside of an object
+- use call and apply
+
+```javascript
+function a() {...}
+a();            // call it
+
+const obj = {
+    // two: function() { return 2 }
+    // or
+    two() { return 2 }
+};
+
+ob.two();       // method
+
+a.call();       //with call and apply
+
+const four = new Function('return 4');
+four();         // create a function with a function constructor
+
+// we can also pass parameters to the function constructor:
+const returnNumPlusFive = new Function('num', 'return num + 5')
+returnNumPlusFive(4);
+```
+
+When we create a function, on the background a callable object is created, not exactly like this, but the same idea:
+```javascript
+function talk() {
+    console.log('Hi');
+};
+
+talk.yell = 'ahhhhhhh';
+
+// background:
+const specialObj = {
+    yell: 'ahhhhhhh',
+    name: 'talk',
+    (): console.log('Hi'),
+    arguments: [],
+    this: ....,
+    call: ....
+}
+```
+
+**Functions are first class citizens in JS**. This means 3 things:
+- functions can be assigned to variables and object properties
+- functions can be passed as parameter to another function
+- we can return functions as values from other functions
+  
+
+#### Higher Order Functions
+
+[Summary](#summary)
+
+Higher Order Functions are either functions that accepts another function as a parameter or returns another function.
+
+Ex:
+```javascript
+function authenticate(validate) {
+    let adminArr = [500, 600, 700, 800];
+    let userArr = [100, 200, 300, 400];
+    return adminArr.includes(validate) || userArr.includes(validate)
+}
+
+function giveAccess(name) {
+    return `${name} is authenticated`;
+}
+
+function login(person, fn) {
+    return fn(person.level) ? giveAccess(person.name) : "This person is not authorized"
+}
+
+login({level: 300, name: 'Tom'}, authenticate);
+```
+
+With HOF we are able to reuse code more easily.
+
+Ex1:
+```javascript
+const multiplyBy = num1 => num2 => num1 * num2;
+const multiplyByTwo = multiplyBy(2);
+multiplyByTwo(4);
+multiplyByTwo(10);
+multiplyBy(3)(5);
+```
+
+### Closures
+
+[Summary](#summary)
+
+Is the combination of function and the lexical scope (variable environment) on which it was declared. Closures allow a function to access variables from an inclosing scope/environment even after it leave the scope on which it was declared.
+
+Ex:
+```javascript
+function a() {
+    let grandpa = 'grandpa';
+    return function b() {
+        let father = 'father';
+        return function c() {
+            let son = 'son';
+            return `${grandpa} > ${father} > ${son}`;
+        }
+    }
+}
+
+a()         // return function b
+a()()()     // return `grandpa > father > son`
+```
+
+So with a closure, when we run the a function first, it is pushed onto the stack and a variable environment, and this context execution had grandpa as a variable.
+Once it is removed from the stack, everything is done, except the grandpa variable, that is put into the closure 'box' (memory heap). However when the garbage collections comes, it sees that grandpa is within the closure box and it cannot be removed because it is being referenced by another function inside of it. The same happens to the function b. And when we finally call the c function, it will look into the closure 'box' first, before going to global scope.
+
+Where we write functions matters.
+
+Ex2. Very interesting one because we define the variable after the return function:
+```javascript
+function callMe() {
+    setTimeout(() => console.log(ring), 4000)
+    const ring = 'ring, ring! ring, ring!'
+}
+
+callMe();       // it will log 'ring, ring! ring, ring!'
+```
+
+Note. we set a timeout, so the return function with be put on the callback queue, and when it is put back on the stack, the `ring` variable has already been created and assigned.
+
+Closures have 2 main benefits:
+- memory efficient
+- encapsulation
+
+###### Memory Efficiency from closures
+
+[Summary](#summary)
+
+```javascript
+function heavyDuty(idx) {
+    const bigArr = new Array(7000).fill('ok');
+    console.log('Created!')
+    return bigArr[idx]
+}
+
+heavyDuty(7)
+heavyDuty(7)
+heavyDuty(7)
+heavyDuty(7)
+
+// every time I call the above function the bigArr will be created and destroyed over and over again. With closures we can save the bigArr and return the function that we will call over and over.
+
+function betterHeavyDuty() {
+    const bigArr = new Array(7000).fill('ok');
+    console.log('Created!')
+    return function(idx) {
+        return bigArr[idx]
+    }
+}
+
+betterHeavyDuty()(7)
+betterHeavyDuty()(7)
+betterHeavyDuty()(7)
+betterHeavyDuty()(7)
+```
+
+###### Encapsulation
+
+With closures we are able to encapsulate the data and expose only what we want.
+
+[Summary](#summary)
+
+```javascript
+const makeBombBtn = () => {
+    let timeToDestroy = 0;
+    const passTime = () => timeToDestroy++;
+    const totalPeaceTime = () => timeToDestroy;
+    const launch = () => {
+        timeToDestroy = -1;
+        return 'Buuuuummmm!'
+        }
+    setInterval(passTime, 1000);
+    return {
+        // launch,
+        totalPeaceTime
+    }
+}
+
+const ohNo = makeBombBtn();
+ohNo.totalPeaceTime();
+// ohNo.launch();
+
+// if I do not expose the launch, no one will be able to use this function, they only have access to totalPeaceTime.
+``` 
+
+Exercise: fix teh below function to log the proper `i` number. Right now it will log 4 times 'I am at index 4'.
+```javascript
+const arr = [1,2,3,4]
+for (var i = 0; i < arr.length; i++) {
+    setTimeout(() => console.log(`I am at index ${arr[i]}`), 3000)
+}
+```
+
+the easiest way, change var to let (block scope), so each `i` will be scoped and saved for its own closure function.
+```javascript
+const arr = [1,2,3,4]
+for (let i = 0; i < arr.length; i++) {
+    setTimeout(() => console.log(`I am at index ${arr[i]}`), 3000)
+}
+```
+
+another way: we create a IIFE and pass the `i` to it, so it will save it.
+```javascript
+const arr = [1,2,3,4]
+for (var i = 0; i < arr.length; i++) {
+    (function(closureI){
+        setTimeout(() => 
+            console.log(`I am at index ${arr[closureI]}`), 3000)
+    })(i)
+}
+```
 
