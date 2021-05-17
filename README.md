@@ -32,6 +32,8 @@
     - [Closures](#closures)
           - [Memory Efficiency from closures](#memory-efficiency-from-closures)
           - [Encapsulation](#encapsulation)
+    - [Prototypal Inheritance](#prototypal-inheritance)
+    - [OOP - Object Oriented Programming](#oop---object-oriented-programming)
 
 ### Javascript Engine
 
@@ -733,4 +735,138 @@ for (var i = 0; i < arr.length; i++) {
     })(i)
 }
 ```
+
+### Prototypal Inheritance
+
+[Summary](#summary)
+
+Inheritance is an object getting access to the properties and methods of another object.
+
+Ex.
+```javascript
+const arr = [];
+
+arr.__proto__       // goes to the Array prototype
+arr.__proto__.__proto__     // goes even upper on the chain and shows us the base Object that everything in JS inherits from
+``` 
+
+```javascript
+let dragon = {
+    name: 'T',
+    fire: true,
+    fight() {return 5},
+    sing() {
+        if (this.fire) `I am ${this.name}, the breather of fire.`
+        else `I am ${this.name}.`}
+}
+
+let lizard = {
+    name: 'K',
+    fight() {return 1}
+}
+
+// let singerLizard = dragon.sing.bind(lizard);
+// console.log(singerLizard());         // I am K.
+
+// creating the prototype chain
+lizard.__proto__ = dragon;
+lizard.fire         // true
+lizard.sing()       // I am K, the breather of fire.
+lizard.fight()      // 1
+
+lizard.isPrototypeOf(dragon);       // true
+
+
+for (let prop in lizard) { 
+    console.log(prop); 
+}           // name, fire, fight, sing
+
+for (let prop in lizard) { 
+    if (lizard.hasOwnProperty(prop)) {
+        console.log(prop); 
+    }
+}       // name and fight
+```
+
+Note: You should NEVER use the `__proto__` method like that. We never want to manually assign like that.
+
+Prototypal Inheritance is useful because you can have objects with properties that point to the same place in memory, thus being more efficient.
+
+At the end of the chain we get a `null`.
+
+The `__proto__` links to the up the chain `prototype` object.
+
+```javascript
+function a() {}
+
+a.__proto__         // is the same of line below because proto
+Function.prototype  // points to the prototype up the chain
+```
+
+How to create the prototypal inheritance the right way:
+```javascript
+let human = {
+    mortal: true
+}
+let socrates = Object.create(human)
+socrates.age = 45;
+console.log(socrates.age)       // 45
+console.log(socrates.mortal)    // true
+console.log(human.isPrototypeOf(socrates))      // true      
+```
+
+We need to use `Object.create(<object to inherit from>)`.
+
+Only functions have the prototype property and it references to an object used to attach properties that will be inherited by objects further down the prototype chain. The last object from the chain is the built-id `Object.prototype`. `Object` is a function. But the `Object.prototype` is an object, it is what we call the `base object`.
+
+All the built-in methods are functions with the prototype object within them.
+
+```javascript
+typeof Object               // function
+typeof Object.prototype     // object
+const obj = {};
+typeof obj                  // object
+console.log(obj.prototype); // undefined
+function a() {}
+typeof a                    // function
+console.log(a.prototype);   // Exists, it will show the prototype object
+
+
+//Exercise - extend the functionality of a built in object
+
+//#1
+//Date object => to have new method .lastYear() which shows you last year 'YYYY' format.
+
+Date.prototype.lastYear = function() {
+    return this.getFullYear()-1
+}       // cannot use arrow functions because of the lexical scope
+
+new Date('1900-10-10').lastYear()
+//'1899'
+new Date().lastYear()
+// '2020'
+
+
+//#Bonus
+// Mofify .map() to print '🗺' at the end of each item.
+Array.prototype.map = function() { 
+    let arr = [];
+    for (let i = 0; i < this.length; i++) {
+        arr.push((this[i]) + '🗺')
+    }
+    return arr
+}
+console.log([1,2,3].map())
+//1🗺, 2🗺, 3🗺
+``` 
+
+When JS was created, both creators were inspired by 2 languages: `Scheme` and `Java`. Java is an OOP, while Scheme had the idea of closures, ending up to be quite functional. That is why JS can be an OOP or a FP. It really depends of what you want for your program to be.
+
+### OOP - Object Oriented Programming
+
+[Summary](#summary)
+
+
+
+
 
