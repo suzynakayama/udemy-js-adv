@@ -866,7 +866,14 @@ When JS was created, both creators were inspired by 2 languages: `Scheme` and `J
 
 [Summary](#summary)
 
+OOP and FP are paradigms. They make code clear and understandable, easy to extend, easy to maintain, memory efficient and keep the code dry.
 
+**OOP (Object Oriented Programming)** - separate the program into separate objects with everything related to that part in there, data, logic etc. Like boxes. Ex. building a robot, we hade a box for the head, a box for the arm, a box for the leg, etc.
 
+**FP (Functional Programming)** - data and behavior are distinct and should be kept separate.
+
+Please check OOP javascript file.
+
+Factory Functions create objects programatically.
 
 
