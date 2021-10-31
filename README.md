@@ -34,6 +34,10 @@
           - [Encapsulation](#encapsulation)
     - [Prototypal Inheritance](#prototypal-inheritance)
     - [OOP - Object Oriented Programming](#oop---object-oriented-programming)
+      - [This within Classes](#this-within-classes)
+    - [Inheritance](#inheritance)
+    - [Private vs Public](#private-vs-public)
+    - [4 Pillars of OOP](#4-pillars-of-oop)
 
 ### Javascript Engine
 
@@ -62,10 +66,11 @@ Interpreters are quick to get on and running. It runs right away. It's best for 
 On these cases, the compiler is best, it takes longer to start, but simplify the code replacing it with an optimized one.
 
 JIT Compiler (Just in Time Compiler) is the mix of interpreters and compilers. That is exactly what V8 does. If you look at the image above, that's how V8 works:
-1. Parse the code (*lexical analysis* of the code, breaking it into *tokens* to identify what the code is trying to do)
-2. AST - separate the code (tokens are formed into an *abstract syntax tree*)
+
+1. Parse the code (_lexical analysis_ of the code, breaking it into _tokens_ to identify what the code is trying to do)
+2. AST - separate the code (tokens are formed into an _abstract syntax tree_)
    [AST Explorer](https://astexplorer.net/)
-3. Runs the Interpreter and returns *Bytecode*
+3. Runs the Interpreter and returns _Bytecode_
 4. The Profiler (aka Monitor) will monitor our code and when it finds code that can be optimized will send it to the Compiler
 5. The Compiler will compile and optimize the code
 
@@ -82,40 +87,41 @@ Both of these do exactly what compilers do: Take one language and convert into a
 [Summary](#summary)
 
 In order to help the JS Engine we should be careful with:
-- eval()
-- arguments
-- for in loop
-- with
-- delete
-- Hidden Classes
-- Inline Caching - 
+
+-   eval()
+-   arguments
+-   for in loop
+-   with
+-   delete
+-   Hidden Classes
+-   Inline Caching -
 
 ```javascript
 const userData = {
-    firstName: 'John',
-    lastName: 'Doe'
-}
+	firstName: "John",
+	lastName: "Doe",
+};
 
 function findUser(user) {
-    return `found ${user.firstName} ${user.lastName}`
+	return `found ${user.firstName} ${user.lastName}`;
 }
 
-findUser(userData)
+findUser(userData);
 
 // Inline Caching - will cache findUser to be the string `found John Doe`, so it will not have to run over and over again
 
-function Animal(x,y) {
-    this.x = x
-    this.y = y
+function Animal(x, y) {
+	this.x = x;
+	this.y = y;
 }
 
-const obj1 = new Animal(1,2)
-const obj2 = new Animal(3,4)
+const obj1 = new Animal(1, 2);
+const obj2 = new Animal(3, 4);
 
-obj1.a = 30
-obj1.b = 100
-obj2.b = 30
-obj2.a = 100
+obj1.a = 30;
+obj1.b = 100;
+obj2.b = 30;
+obj2.a = 100;
 
 // Hidden Classes - the above code will make the compiler run slower. So to avoid this issue, make sure you add things in the same order or you add the things in the constructor. And that's why the delete is also problematic.
 ```
@@ -138,15 +144,16 @@ Stack Overflow happens when the call stack size is exceeded.
 JS is a garbage collected language. In other words, when JS realize we are not using the data, the garbage collector will free up the memory.
 
 Memory Leaks happen when we forget to clean up the code and the garbage collector don't reach that specific code in order to free it up. The most common ways this happens:
-- Global Variables
-- Event Listeners - you add new ones and never clean up when you don't need anymore
-- SetTimeout and SetInterval - the objects inside them are never going to get collected
+
+-   Global Variables
+-   Event Listeners - you add new ones and never clean up when you don't need anymore
+-   SetTimeout and SetInterval - the objects inside them are never going to get collected
 
 ##### Single Threaded language
 
 [Summary](#summary)
 
-JS is a single thread language, so the code runs line by line. And because of that JS is synchronous. 
+JS is a single thread language, so the code runs line by line. And because of that JS is synchronous.
 
 [The JS Runtime](https://www.youtube.com/watch?v=8aGhZQkoFbQ&feature=emb_title)
 
@@ -171,22 +178,22 @@ On the second phase, a new Execution Context is created to run our code.
 It means where is the code written? Ex.
 
 ```javascript
-function hi(){
-    return 'Hi'
+function hi() {
+	return "Hi";
 }
 
 function sayHi() {
-    function inside() {
-        return 'I am inside!'
-    }
-    return hi()
+	function inside() {
+		return "I am inside!";
+	}
+	return hi();
 }
 
 function bePolite() {
-    return sayHi()
+	return sayHi();
 }
 
-bePolite()
+bePolite();
 
 // In this example we can see that functions: hi, sayHi, and bePolite, were written in the global environment. While function inside was written within the sayHi environment.
 ```
@@ -203,28 +210,29 @@ The very first lexical environment that we have is the global environment.
 
 [Summary](#summary)
 
-Is the behavior of moving the functions declarations/variables to the top of their respective environments during compilation phase. Variables are partially hoisted (we hoist the variables defined with **var** * but assign undefined) and function declarations are hoisted.
+Is the behavior of moving the functions declarations/variables to the top of their respective environments during compilation phase. Variables are partially hoisted (we hoist the variables defined with **var** \* but assign undefined) and function declarations are hoisted.
 
-*\* variables and functions defined with **let** or **const** are not hoisted.*
+_\* variables and functions defined with **let** or **const** are not hoisted._
 
 Interesting Example:
+
 ```javascript
 // hoisted:
 // var favoriteFood = undefined;
 // var foodThoughts = undefined;
 
-var favoriteFood = 'grapes';
+var favoriteFood = "grapes";
 
 var foodThoughts = function () {
-    //hoisted:
-    // var favoriteFood = undefined
+	//hoisted:
+	// var favoriteFood = undefined
 
-    console.log('Original favorite food: ' + favoriteFood);
+	console.log("Original favorite food: " + favoriteFood);
 
-    var favoriteFood = 'sushi';
+	var favoriteFood = "sushi";
 
-    console.log('New favorite food: ' + favoriteFood);
-}
+	console.log("New favorite food: " + favoriteFood);
+};
 
 // logs:
 // Original favorite food: undefined
@@ -240,18 +248,19 @@ Function declaration: `function x() {...}`
 Function Expression: `const x = () => {}`
 
 Function Invocation/Call/Execution - just run the function and creates an execution context with:
-- `this`
-- `arguments`
+
+-   `this`
+-   `arguments`
 
 The `arguments` keyword is a special keyword in JS.
 
 ```javascript
 const marry = (p1, p2) => {
-    console.log('arguments: ' + arguments)
-    return `${p1} married ${p2}!`
-}
+	console.log("arguments: " + arguments);
+	return `${p1} married ${p2}!`;
+};
 
-marry('John', 'Jane')
+marry("John", "Jane");
 // arguments: {0: 'John', 1: 'Jane'}
 // John married Jane!
 ```
@@ -281,9 +290,9 @@ In JS, you can create the block scope using `const` and `let` for variable decla
 An IIFE is a anonymous function expression that is immediately invoked after being created.
 
 ```javascript
-(function() {
-    // do something
-})()
+(function () {
+	// do something
+})();
 ```
 
 So, why use IIFE? It will create a new execution environment, so you won't have a problem with scope and will minimize the amount of data that we add to the global environment.
@@ -307,10 +316,10 @@ If you use `use strict` the `this` inside the function will be undefined.
 ```javascript
 const myObj = {
     name: 'Suzy',
-    sing() { 
+    sing() {
         return 'alalala ' + this.name
     }
-    singAgain() { 
+    singAgain() {
         return this.sing() = '!'
     }
 }
@@ -319,47 +328,46 @@ myObj.sing()    // alalala Suzy
 ```
 
 So, `this` has 2 main benefits:
-- gives methods access to their object (example above)
-- execute same code for multiple objects (example below)
+
+-   gives methods access to their object (example above)
+-   execute same code for multiple objects (example below)
 
 ```javascript
 const importantPerson = () => {
-    console.log(this.name + '!')
-}
+	console.log(this.name + "!");
+};
 
-importantPerson()   // == window.importantPerson() ==> this is window
+importantPerson(); // == window.importantPerson() ==> this is window
 
-const name = 'Sunny';
+const name = "Sunny";
 const obj1 = {
-    name: 'Suzy',
-    importantPerson: importantPerson
-}
+	name: "Suzy",
+	importantPerson: importantPerson,
+};
 
 const obj2 = {
-    name: 'Pedro',
-    importantPerson: importantPerson
-}
+	name: "Pedro",
+	importantPerson: importantPerson,
+};
 
-importantPerson()           // Sunny!
-obj1.importantPerson()      // Suzy!
-obj2.importantPerson()      // Pedro!
-
-
+importantPerson(); // Sunny!
+obj1.importantPerson(); // Suzy!
+obj2.importantPerson(); // Pedro!
 
 // Another example
 const a = () => {
-    console.log('a', this);
-    const b = () => {
-        console.log('b', this);
-        const c = {
-            hi: () => console.log('c', this),
-        }
-        c.hi()
-    }
-    b()
-}
+	console.log("a", this);
+	const b = () => {
+		console.log("b", this);
+		const c = {
+			hi: () => console.log("c", this),
+		};
+		c.hi();
+	};
+	b();
+};
 
-a()
+a();
 // a window     ==> window.a()
 // b window     ==> window.a(b())
 // c {hi: f}    ==> c.hi()
@@ -377,29 +385,29 @@ Within an object, always use arrow function to bind this to the object. On the o
 
 ```javascript
 const wizard = {
-    name: 'Merlin',
-    health: 50,
-    heal(num1 = 50, num2 = 50) {
-        return this.health = num1 + num2;
-    }
-}
+	name: "Merlin",
+	health: 50,
+	heal(num1 = 50, num2 = 50) {
+		return (this.health = num1 + num2);
+	},
+};
 
 const archer = {
-    name: 'Robin Hood',
-    health: 30
-}
+	name: "Robin Hood",
+	health: 30,
+};
 
-console.log('1', archer.health)     //1 30
-wizard.heal()       // 100
-wizard.heal.call(archer)
-console.log('2', archer.health)     //2 100
-wizard.heal.call(archer, 45, 35)
-console.log('3', archer.health)     //3 80
+console.log("1", archer.health); //1 30
+wizard.heal(); // 100
+wizard.heal.call(archer);
+console.log("2", archer.health); //2 100
+wizard.heal.call(archer, 45, 35);
+console.log("3", archer.health); //3 80
 
-wizard.heal.apply(archer, [45, 35])
+wizard.heal.apply(archer, [45, 35]);
 
-const healArcher = wizard.heal.bind(archer, 45, 35)
-healArcher()        // 80
+const healArcher = wizard.heal.bind(archer, 45, 35);
+healArcher(); // 80
 ```
 
 ###### Currying and Bind
@@ -409,11 +417,11 @@ healArcher()        // 80
 Refers to only partially getting a parameter to a function and save it to use later.
 
 ```javascript
-const multiply = (a,b) => a * b;
+const multiply = (a, b) => a * b;
 
-let multiplyBy2 = multiply.bind(this, 2)
+let multiplyBy2 = multiply.bind(this, 2);
 
-console.log(multiplyBy2(4))     // 8
+console.log(multiplyBy2(4)); // 8
 ```
 
 ##### Scope vs Context
@@ -434,8 +442,8 @@ Context is about the object. What is the value of the `this` keyword. Usually de
 5. Null
 6. Symbol('just me')
 7. Object
-   1. Array - to check if variable is an array use: `Array.isArray(variable)`
-   2. Function
+    1. Array - to check if variable is an array use: `Array.isArray(variable)`
+    2. Function
 
 ##### Pass By Value vs Pass By Reference
 
@@ -446,44 +454,45 @@ Primitive types are immutable. Ex. `let a = 10`
 Objects are pass by reference. They pass the reference in memory from that object.
 
 To create copies of objects without using the reference:
-```javascript
-let obj = {a:'a', b:'b'};
-let clone = Object.assign({}, obj);
-let clone2 = {...obj}
 
-obj.b = 5
-console.log(obj)        // {a:'a', b:5}
-console.log(clone)      // {a:'a', b:'b'}
-console.log(clone2)     // {a:'a', b:'b'}
-``` 
+```javascript
+let obj = { a: "a", b: "b" };
+let clone = Object.assign({}, obj);
+let clone2 = { ...obj };
+
+obj.b = 5;
+console.log(obj); // {a:'a', b:5}
+console.log(clone); // {a:'a', b:'b'}
+console.log(clone2); // {a:'a', b:'b'}
+```
 
 NOTE: these options above are only shallow clones. If you have ??, you should do a deep clone, you can do that using JSON or a library. Be careful with deep cloning because it can take a long time.
 
 ```javascript
-let obj = {a:'a', b:'b', c: {deep: 'hahaha'}};
+let obj = { a: "a", b: "b", c: { deep: "hahaha" } };
 let clone = Object.assign({}, obj);
-let clone2 = {...obj}
-clone.c.deep = 'different'
+let clone2 = { ...obj };
+clone.c.deep = "different";
 
-let superClone = JSON.parse(JSON.stringify(obj))
+let superClone = JSON.parse(JSON.stringify(obj));
 
-obj.b = 5
-console.log(obj)        // {a:'a', b:5, c: {deep: 'different'}}
-console.log(clone)      // {a:'a', b:'b', c: {deep: 'different'}}
-console.log(clone2)     // {a:'a', b:'b', c: {deep: 'different'}}
+obj.b = 5;
+console.log(obj); // {a:'a', b:5, c: {deep: 'different'}}
+console.log(clone); // {a:'a', b:'b', c: {deep: 'different'}}
+console.log(clone2); // {a:'a', b:'b', c: {deep: 'different'}}
 ```
 
 Exercise: How would you compare two objects if they are pointing to a different location in memory but still have the same properties?
 
 ```javascript
-var user1 = {name : "nerd", org: "dev"};
-var user2 = {name : "nerd", org: "dev"};
+var user1 = { name: "nerd", org: "dev" };
+var user2 = { name: "nerd", org: "dev" };
 
 var eq = user1 == user2;
 console.log(eq); // gives false
 
 // the below only works if the properties are in order
-var eq1 = JSON.stringify(obj1) === JSON.stringify(obj2) 
+var eq1 = JSON.stringify(obj1) === JSON.stringify(obj2);
 console.log(eq1); // gives true
 ```
 
@@ -517,9 +526,10 @@ Means the language converting the variable from one type to another.
 Arrays and Functions in JS are objects. Functions are special objects, they are callable objects. When we invoke a function we get 2 parameters (`this` and `arguments`).
 
 Ways to invoke a function:
-- call it as a regular function
-- as a method - function inside of an object
-- use call and apply
+
+-   call it as a regular function
+-   as a method - function inside of an object
+-   use call and apply
 
 ```javascript
 function a() {...}
@@ -544,6 +554,7 @@ returnNumPlusFive(4);
 ```
 
 When we create a function, on the background a callable object is created, not exactly like this, but the same idea:
+
 ```javascript
 function talk() {
     console.log('Hi');
@@ -563,10 +574,10 @@ const specialObj = {
 ```
 
 **Functions are first class citizens in JS**. This means 3 things:
-- functions can be assigned to variables and object properties
-- functions can be passed as parameter to another function
-- we can return functions as values from other functions
-  
+
+-   functions can be assigned to variables and object properties
+-   functions can be passed as parameter to another function
+-   we can return functions as values from other functions
 
 #### Higher Order Functions
 
@@ -575,27 +586,31 @@ const specialObj = {
 Higher Order Functions are either functions that accepts another function as a parameter or returns another function.
 
 Ex:
+
 ```javascript
 function authenticate(validate) {
-    let adminArr = [500, 600, 700, 800];
-    let userArr = [100, 200, 300, 400];
-    return adminArr.includes(validate) || userArr.includes(validate)
+	let adminArr = [500, 600, 700, 800];
+	let userArr = [100, 200, 300, 400];
+	return adminArr.includes(validate) || userArr.includes(validate);
 }
 
 function giveAccess(name) {
-    return `${name} is authenticated`;
+	return `${name} is authenticated`;
 }
 
 function login(person, fn) {
-    return fn(person.level) ? giveAccess(person.name) : "This person is not authorized"
+	return fn(person.level)
+		? giveAccess(person.name)
+		: "This person is not authorized";
 }
 
-login({level: 300, name: 'Tom'}, authenticate);
+login({ level: 300, name: "Tom" }, authenticate);
 ```
 
 With HOF we are able to reuse code more easily.
 
 Ex1:
+
 ```javascript
 const multiplyBy = num1 => num2 => num1 * num2;
 const multiplyByTwo = multiplyBy(2);
@@ -611,20 +626,21 @@ multiplyBy(3)(5);
 Is the combination of function and the lexical scope (variable environment) on which it was declared. Closures allow a function to access variables from an inclosing scope/environment even after it leave the scope on which it was declared.
 
 Ex:
+
 ```javascript
 function a() {
-    let grandpa = 'grandpa';
-    return function b() {
-        let father = 'father';
-        return function c() {
-            let son = 'son';
-            return `${grandpa} > ${father} > ${son}`;
-        }
-    }
+	let grandpa = "grandpa";
+	return function b() {
+		let father = "father";
+		return function c() {
+			let son = "son";
+			return `${grandpa} > ${father} > ${son}`;
+		};
+	};
 }
 
-a()         // return function b
-a()()()     // return `grandpa > father > son`
+a(); // return function b
+a()()(); // return `grandpa > father > son`
 ```
 
 So with a closure, when we run the a function first, it is pushed onto the stack and a variable environment, and this context execution had grandpa as a variable.
@@ -633,20 +649,22 @@ Once it is removed from the stack, everything is done, except the grandpa variab
 Where we write functions matters.
 
 Ex2. Very interesting one because we define the variable after the return function:
+
 ```javascript
 function callMe() {
-    setTimeout(() => console.log(ring), 4000)
-    const ring = 'ring, ring! ring, ring!'
+	setTimeout(() => console.log(ring), 4000);
+	const ring = "ring, ring! ring, ring!";
 }
 
-callMe();       // it will log 'ring, ring! ring, ring!'
+callMe(); // it will log 'ring, ring! ring, ring!'
 ```
 
 Note. we set a timeout, so the return function with be put on the callback queue, and when it is put back on the stack, the `ring` variable has already been created and assigned.
 
 Closures have 2 main benefits:
-- memory efficient
-- encapsulation
+
+-   memory efficient
+-   encapsulation
 
 ###### Memory Efficiency from closures
 
@@ -654,30 +672,30 @@ Closures have 2 main benefits:
 
 ```javascript
 function heavyDuty(idx) {
-    const bigArr = new Array(7000).fill('ok');
-    console.log('Created!')
-    return bigArr[idx]
+	const bigArr = new Array(7000).fill("ok");
+	console.log("Created!");
+	return bigArr[idx];
 }
 
-heavyDuty(7)
-heavyDuty(7)
-heavyDuty(7)
-heavyDuty(7)
+heavyDuty(7);
+heavyDuty(7);
+heavyDuty(7);
+heavyDuty(7);
 
 // every time I call the above function the bigArr will be created and destroyed over and over again. With closures we can save the bigArr and return the function that we will call over and over.
 
 function betterHeavyDuty() {
-    const bigArr = new Array(7000).fill('ok');
-    console.log('Created!')
-    return function(idx) {
-        return bigArr[idx]
-    }
+	const bigArr = new Array(7000).fill("ok");
+	console.log("Created!");
+	return function (idx) {
+		return bigArr[idx];
+	};
 }
 
-betterHeavyDuty()(7)
-betterHeavyDuty()(7)
-betterHeavyDuty()(7)
-betterHeavyDuty()(7)
+betterHeavyDuty()(7);
+betterHeavyDuty()(7);
+betterHeavyDuty()(7);
+betterHeavyDuty()(7);
 ```
 
 ###### Encapsulation
@@ -688,51 +706,53 @@ With closures we are able to encapsulate the data and expose only what we want.
 
 ```javascript
 const makeBombBtn = () => {
-    let timeToDestroy = 0;
-    const passTime = () => timeToDestroy++;
-    const totalPeaceTime = () => timeToDestroy;
-    const launch = () => {
-        timeToDestroy = -1;
-        return 'Buuuuummmm!'
-        }
-    setInterval(passTime, 1000);
-    return {
-        // launch,
-        totalPeaceTime
-    }
-}
+	let timeToDestroy = 0;
+	const passTime = () => timeToDestroy++;
+	const totalPeaceTime = () => timeToDestroy;
+	const launch = () => {
+		timeToDestroy = -1;
+		return "Buuuuummmm!";
+	};
+	setInterval(passTime, 1000);
+	return {
+		// launch,
+		totalPeaceTime,
+	};
+};
 
 const ohNo = makeBombBtn();
 ohNo.totalPeaceTime();
 // ohNo.launch();
 
 // if I do not expose the launch, no one will be able to use this function, they only have access to totalPeaceTime.
-``` 
+```
 
 Exercise: fix teh below function to log the proper `i` number. Right now it will log 4 times 'I am at index 4'.
+
 ```javascript
-const arr = [1,2,3,4]
+const arr = [1, 2, 3, 4];
 for (var i = 0; i < arr.length; i++) {
-    setTimeout(() => console.log(`I am at index ${arr[i]}`), 3000)
+	setTimeout(() => console.log(`I am at index ${arr[i]}`), 3000);
 }
 ```
 
 the easiest way, change var to let (block scope), so each `i` will be scoped and saved for its own closure function.
+
 ```javascript
-const arr = [1,2,3,4]
+const arr = [1, 2, 3, 4];
 for (let i = 0; i < arr.length; i++) {
-    setTimeout(() => console.log(`I am at index ${arr[i]}`), 3000)
+	setTimeout(() => console.log(`I am at index ${arr[i]}`), 3000);
 }
 ```
 
 another way: we create a IIFE and pass the `i` to it, so it will save it.
+
 ```javascript
-const arr = [1,2,3,4]
+const arr = [1, 2, 3, 4];
 for (var i = 0; i < arr.length; i++) {
-    (function(closureI){
-        setTimeout(() => 
-            console.log(`I am at index ${arr[closureI]}`), 3000)
-    })(i)
+	(function (closureI) {
+		setTimeout(() => console.log(`I am at index ${arr[closureI]}`), 3000);
+	})(i);
 }
 ```
 
@@ -743,49 +763,54 @@ for (var i = 0; i < arr.length; i++) {
 Inheritance is an object getting access to the properties and methods of another object.
 
 Ex.
+
 ```javascript
 const arr = [];
 
-arr.__proto__       // goes to the Array prototype
-arr.__proto__.__proto__     // goes even upper on the chain and shows us the base Object that everything in JS inherits from
-``` 
+arr.__proto__; // goes to the Array prototype
+arr.__proto__.__proto__; // goes even upper on the chain and shows us the base Object that everything in JS inherits from
+```
 
 ```javascript
 let dragon = {
-    name: 'T',
-    fire: true,
-    fight() {return 5},
-    sing() {
-        if (this.fire) `I am ${this.name}, the breather of fire.`
-        else `I am ${this.name}.`}
-}
+	name: "T",
+	fire: true,
+	fight() {
+		return 5;
+	},
+	sing() {
+		if (this.fire) `I am ${this.name}, the breather of fire.`;
+		else `I am ${this.name}.`;
+	},
+};
 
 let lizard = {
-    name: 'K',
-    fight() {return 1}
-}
+	name: "K",
+	fight() {
+		return 1;
+	},
+};
 
 // let singerLizard = dragon.sing.bind(lizard);
 // console.log(singerLizard());         // I am K.
 
 // creating the prototype chain
 lizard.__proto__ = dragon;
-lizard.fire         // true
-lizard.sing()       // I am K, the breather of fire.
-lizard.fight()      // 1
+lizard.fire; // true
+lizard.sing(); // I am K, the breather of fire.
+lizard.fight(); // 1
 
-lizard.isPrototypeOf(dragon);       // true
+lizard.isPrototypeOf(dragon); // true
 
+for (let prop in lizard) {
+	console.log(prop);
+} // name, fire, fight, sing
 
-for (let prop in lizard) { 
-    console.log(prop); 
-}           // name, fire, fight, sing
-
-for (let prop in lizard) { 
-    if (lizard.hasOwnProperty(prop)) {
-        console.log(prop); 
-    }
-}       // name and fight
+for (let prop in lizard) {
+	if (lizard.hasOwnProperty(prop)) {
+		console.log(prop);
+	}
+} // name and fight
 ```
 
 Note: You should NEVER use the `__proto__` method like that. We never want to manually assign like that.
@@ -799,20 +824,21 @@ The `__proto__` links to the up the chain `prototype` object.
 ```javascript
 function a() {}
 
-a.__proto__         // is the same of line below because proto
-Function.prototype  // points to the prototype up the chain
+a.__proto__; // is the same of line below because proto
+Function.prototype; // points to the prototype up the chain
 ```
 
 How to create the prototypal inheritance the right way:
+
 ```javascript
 let human = {
-    mortal: true
-}
-let socrates = Object.create(human)
+	mortal: true,
+};
+let socrates = Object.create(human);
 socrates.age = 45;
-console.log(socrates.age)       // 45
-console.log(socrates.mortal)    // true
-console.log(human.isPrototypeOf(socrates))      // true      
+console.log(socrates.age); // 45
+console.log(socrates.mortal); // true
+console.log(human.isPrototypeOf(socrates)); // true
 ```
 
 We need to use `Object.create(<object to inherit from>)`.
@@ -822,43 +848,41 @@ Only functions have the prototype property and it references to an object used t
 All the built-in methods are functions with the prototype object within them.
 
 ```javascript
-typeof Object               // function
-typeof Object.prototype     // object
+typeof Object; // function
+typeof Object.prototype; // object
 const obj = {};
-typeof obj                  // object
+typeof obj; // object
 console.log(obj.prototype); // undefined
 function a() {}
-typeof a                    // function
-console.log(a.prototype);   // Exists, it will show the prototype object
-
+typeof a; // function
+console.log(a.prototype); // Exists, it will show the prototype object
 
 //Exercise - extend the functionality of a built in object
 
 //#1
 //Date object => to have new method .lastYear() which shows you last year 'YYYY' format.
 
-Date.prototype.lastYear = function() {
-    return this.getFullYear()-1
-}       // cannot use arrow functions because of the lexical scope
+Date.prototype.lastYear = function () {
+	return this.getFullYear() - 1;
+}; // cannot use arrow functions because of the lexical scope
 
-new Date('1900-10-10').lastYear()
+new Date("1900-10-10").lastYear();
 //'1899'
-new Date().lastYear()
+new Date().lastYear();
 // '2020'
-
 
 //#Bonus
 // Mofify .map() to print '🗺' at the end of each item.
-Array.prototype.map = function() { 
-    let arr = [];
-    for (let i = 0; i < this.length; i++) {
-        arr.push((this[i]) + '🗺')
-    }
-    return arr
-}
-console.log([1,2,3].map())
+Array.prototype.map = function () {
+	let arr = [];
+	for (let i = 0; i < this.length; i++) {
+		arr.push(this[i] + "🗺");
+	}
+	return arr;
+};
+console.log([1, 2, 3].map());
 //1🗺, 2🗺, 3🗺
-``` 
+```
 
 When JS was created, both creators were inspired by 2 languages: `Scheme` and `Java`. Java is an OOP, while Scheme had the idea of closures, ending up to be quite functional. That is why JS can be an OOP or a FP. It really depends of what you want for your program to be.
 
@@ -870,10 +894,163 @@ OOP and FP are paradigms. They make code clear and understandable, easy to exten
 
 **OOP (Object Oriented Programming)** - separate the program into separate objects with everything related to that part in there, data, logic etc. Like boxes. Ex. building a robot, we hade a box for the head, a box for the arm, a box for the leg, etc.
 
+Note. With ES6 the keyword Class finally arrived in JS. However, keep in mind this is not a real Class, it is a syntactic sugar because under the hood JS is still using prototypal inheritance. Some people call this "pseudo classical inheritance".
+
+#### This within Classes
+
+[Summary](#summary)
+
+4 ways of using `this`:
+
+1. New way of binding
+
+```javascript
+function Person(name, age) {
+	this.name = name;
+	this.age = age;
+}
+const person1 = new Person("bob", 30);
+```
+
+2. Implicit binding
+   When the `this` keyword inside an object refers to the object.
+
+```javascript
+const person2 = {
+	name: "Karen",
+	age: 40,
+	hi() {
+		console.log(`Hi, my name is ${this.name}.`);
+	},
+};
+```
+
+3. Explicit binding
+   When we explicitly dictate what the `this` keyword should refer to. Is using `bind`, `call`, or `apply`.
+
+```javascript
+const person3 = {
+    name: 'Karen',
+    age: 40,
+    hi() {
+        console.log('Hi.' + this.setTimeout)
+    }.bind(window)
+}
+```
+
+4. Arrow functions
+   With the arrow function if we use `this` keyword we will be doing lexical scope. So wherever we write the function that's what `this` binds to.
+
+```javascript
+const person4 = {
+	name: "Karen",
+	age: 40,
+	hi: function () {
+		const inner = () => {
+			console.log(`Hi, my name is ${this.name}.`);
+		};
+		return inner();
+	},
+};
+
+person4.hi(); // Hi, my name is Karen
+```
+
+In this case, if we didn't use the arrow function, `this` would be the window object, which is not what we expect.
+
+### Inheritance
+
+[Summary](#summary)
+
+It means passing knowledge down. It just doesn't copy the code to the subclasses, it makes the subclasses extend the superclass.
+
+Use `extends` keyword and `super()` to inherit the constructor.
+
+Check OOP.js.
+
+### Private vs Public
+
+[Summary](#summary)
+
+In ES2020 the `#` was introduced to JS. Before that, what developers used to use was adding `_` in front of the variable, so other developers would know that was private to the class and should not be called anywhere. However `_` doesn't really make it private, if you wanted you could still use it.
+
+Now we can finally use `#` for that!
+
+Ex. `#privateMethod() {...}`
+
+### 4 Pillars of OOP
+
+[Summary](#summary)
+
+So, summarizing the 4 pillars of OOP are:
+
+1. **Encapsulation** - before this, we had procedural programming, now with encapsulation, we wrap code into boxes that are related to one another. It makes code easier to maintain and more useable.
+2. **Abstraction** - hiding the complexity from the user, creating simple interfaces. I'll take care of the class and all you need to do is instantiate it. It comes will everything you need.
+3. **Inheritance** - by inheriting from other classes we avoid having to re-write the same code, and we also save memory space by having shared methods.
+4. **Polymorphism** - (many forms) The idea is having the ability to call the same method in different objects and each one responding in a different way. For ex. when we override a method with its own form in the subclass:
+
+```javascript
+// superclass or base class
+class Character {
+	constructor(name, weapon) {
+		this.name = name;
+		this.weapon = weapon;
+	}
+
+	attack() {
+		return `attack with ${this.weapon}`;
+	}
+
+	#privateMethod() {
+		return `this is a private method!`;
+	}
+}
+
+// subclass - use super() to call the superclass constructor
+class Elf extends Character {
+	constructor(name, weapon, type) {
+		super(name, weapon);
+		this.type = type;
+	}
+	attack(cry) {
+		return `attack with ${cry}`;
+	}
+}
+
+const dolby = new Elf("Dolby", "cloth", "house");
+dolby.attack("weee"); // attack with weee
+```
+
+Or we could do method overloading, which is adding a feature/parameters to the superclass method. Ex.
+
+```javascript
+class Character {
+	constructor(name, weapon) {
+		this.name = name;
+		this.weapon = weapon;
+	}
+
+	attack(cry) {
+		return `attack with ${this.weapon} and ${cry}`;
+	}
+}
+
+class Elf extends Character {
+	constructor(name, weapon, type) {
+		super(name, weapon);
+		this.type = type;
+	}
+	attack(cry) {
+		return super.attack(cry);
+	}
+}
+
+const dolby = new Elf("Dolby", "cloth", "house");
+dolby.attack("weee"); // attack with cloth and weee
+```
+
 **FP (Functional Programming)** - data and behavior are distinct and should be kept separate.
 
 Please check OOP javascript file.
 
 Factory Functions create objects programatically.
-
-
