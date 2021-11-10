@@ -35,9 +35,22 @@
     - [Prototypal Inheritance](#prototypal-inheritance)
     - [OOP - Object Oriented Programming](#oop---object-oriented-programming)
       - [This within Classes](#this-within-classes)
-    - [Inheritance](#inheritance)
-    - [Private vs Public](#private-vs-public)
-    - [4 Pillars of OOP](#4-pillars-of-oop)
+      - [Inheritance](#inheritance)
+      - [Private vs Public](#private-vs-public)
+      - [4 Pillars of OOP](#4-pillars-of-oop)
+    - [FP (Functional Programming)](#fp-functional-programming)
+      - [Pure Functions](#pure-functions)
+      - [Idempotence](#idempotence)
+      - [Imperative vs Declarative](#imperative-vs-declarative)
+      - [Immutability](#immutability)
+      - [Higher Order Functions and Closure Review](#higher-order-functions-and-closure-review)
+      - [Currying](#currying)
+      - [Partial Application](#partial-application)
+      - [Memoization / Caching](#memoization--caching)
+      - [Compose and Pipe](#compose-and-pipe)
+      - [Arity](#arity)
+    - [Composition vs inheritance](#composition-vs-inheritance)
+      - [OOP vs FP](#oop-vs-fp)
 
 ### Javascript Engine
 
@@ -958,7 +971,7 @@ person4.hi(); // Hi, my name is Karen
 
 In this case, if we didn't use the arrow function, `this` would be the window object, which is not what we expect.
 
-### Inheritance
+#### Inheritance
 
 [Summary](#summary)
 
@@ -968,7 +981,7 @@ Use `extends` keyword and `super()` to inherit the constructor.
 
 Check OOP.js.
 
-### Private vs Public
+#### Private vs Public
 
 [Summary](#summary)
 
@@ -978,7 +991,7 @@ Now we can finally use `#` for that!
 
 Ex. `#privateMethod() {...}`
 
-### 4 Pillars of OOP
+#### 4 Pillars of OOP
 
 [Summary](#summary)
 
@@ -1049,8 +1062,343 @@ const dolby = new Elf("Dolby", "cloth", "house");
 dolby.attack("weee"); // attack with cloth and weee
 ```
 
-**FP (Functional Programming)** - data and behavior are distinct and should be kept separate.
-
 Please check OOP javascript file.
 
 Factory Functions create objects programatically.
+
+### FP (Functional Programming)
+
+[Summary](#summary)
+
+Data and behavior are distinct and should be kept separate.
+
+Is all about separation of concerns. It's all about packaging our code into separate chunks.
+
+But it also separate data and functions.
+
+It is usually based on simplicity.
+
+Functions operates in data structures, instead of belonging into the data structure. Ex. function operates in array, instead of being a method of an object.
+
+The goals of FP are the same as OOP:
+
+1. Make our code Clear and Understandable
+2. Easy to Extend
+3. Easy to Maintain
+4. Keep our Memory Efficient by having reusable functions
+5. Keep the code DRY
+
+**Pure Functions** - separation of data and behavior of program. And all objects are immutable. We avoid things like shared state.
+
+#### Pure Functions
+
+[Summary](#summary)
+
+2 Main things:
+
+1. a function has to always return the same output given the same input
+2. a function cannot modify anything outside of itself - no side effects
+
+Note. the following is not a pure function because it is modifying something outside, in this case the window object, and it has side effects.
+
+```javascript
+function a() {
+	console.log("hi");
+}
+```
+
+**Referential Transparency** means, if I change the function for its result, in this case for 5, it will not have any effect to the program. So, no matter the input, if they are the same, the output will be the same.
+
+```javascript
+function b(n1, n2) {
+	return n1 + n2;
+}
+b(2, 3); // always 5
+
+function c(n) {
+	return n * 2;
+}
+c(b(2, 3)); // is the same as c(5)
+```
+
+![functional programming](images/fp.png)
+
+#### Idempotence
+
+[Summary](#summary)
+
+The function always does/returns what we expect it to do. It's a little bit different from pure functions because `console.log` would still be a idempotent function.
+
+Another example is the API get request, with the same parameters it will always return the same result.
+
+It is very important because it makes our code predictable.
+
+Another important thing is the idea that even if we call the same function over and over inside itself, it will always return the same result. Ex. `Math.abs(Math.abs(-50))`
+
+#### Imperative vs Declarative
+
+[Summary](#summary)
+
+**Imperative** code is the code that tells the machine WHAT to do and HOW to do it. Great example are `for loops`. Declare variable i, it will start at 0 and go until 99 and increment by 1 every time and for each item console.log it. Another example is jQuery.
+
+**Declarative** code is the code that tells the machine WHAT to do and WHAT should happen. Here the code doesn't say HOW to do it. Great example here is a `forEach loop`. We give the array, for each item console.log it. Another example is React.
+
+```javascript
+// Imperative - for loop
+for (let i = 0; i < 100; i++) {
+	console.log(i);
+}
+
+// Declarative - forEach loop
+[1, 2, 3].forEach(i => console.log(i));
+```
+
+#### Immutability
+
+[Summary](#summary)
+
+Means not changing the data, the state.
+
+Ex.
+
+```javascript
+const obj = { name: "Bob" };
+function clone(obj) {
+	return { ...obj };
+}
+
+function updateName(obj) {
+	const obj2 = clone(obj);
+	obj2.name = "Nana";
+	return obj2;
+}
+
+updateName(obj);
+console.log(obj); // initial object is the same
+```
+
+**Structural Sharing** is the idea that we don't copy everything, what happens is that only the changes will be copied. So it doesn't fill up the whole memory.
+
+#### Higher Order Functions and Closure Review
+
+[Summary](#summary)
+
+**HOF** is a function that either takes function as arguments or return a function, like a callback. Is the idea that functions are **first citizens** in JS. Example:
+
+```javascript
+const hof = fn => fn(5);
+hof(function a(x) {
+	return x;
+});
+```
+
+**Closure** mechanism for containing some sort of state. Define a function inside another function and expose it so we can use that variable. Example:
+
+```javascript
+const closure = function () {
+	let count = 0;
+	return function increment() {
+		count++;
+		return count;
+	};
+};
+const incrementFn = closure();
+incrementFn(); // 1
+incrementFn(); // 2
+incrementFn(); // 3
+```
+
+So because we created a closure, even if the previous call has already finished, the function will remember that variable for the next time it is called.
+
+For FP closures can be used, as long as we don't modify/mutate the data (variable). We are able to use closures to create private variables. Ex:
+
+```javascript
+const closure = function () {
+	let count = 50;
+	return function getCounter() {
+		return count;
+	};
+};
+const getCounter = closure();
+getCounter(); // 55
+getCounter(); // 55
+getCounter(); // 55
+```
+
+#### Currying
+
+[Summary](#summary)
+
+Technique of translating the evaluation of a function that takes multiple arguments into evaluating a sequence of functions, each with a single argument. In other words, you take a function that can take multiple parameters, and instead using curry you modify it into a function that take only one parameter at a time.
+
+Ex.
+
+```javascript
+const multiply = (a, b) => a * b;
+multiply(3, 5); // 15
+
+// currying
+const curryMultiply = a => b => a * b;
+curryMultiply(3)(5); // 15
+
+const curryMultiplyBy5 = curryMultiply(5);
+curryMultiplyBy5(4); // 20
+```
+
+#### Partial Application
+
+[Summary](#summary)
+
+Way for us to partially apply a function. Process of producing a function with a smaller number of parameters. It means taking a function applying some of its arguments into the function so it remembers those parameters and then it uses closures to later on be called with all the rest of the arguments.
+
+Ex.
+
+```javascript
+const multiply = (a, b, c) => a * b * c;
+const curriedMultiply = a => b => c => a * b * c;
+const partiallyApplicationMultiplyBy5 = multiply.bind(null, 5);
+partiallyApplicationMultiplyBy5(4, 10); // 200
+```
+
+The difference between currying and partial application is that curry expects 1 argument at a time, while partial application can receive more than one.
+
+#### Memoization / Caching
+
+[Summary](#summary)
+
+Caching is a way to store values so you can use them later one. Ex. caching is like a backpack, so instead of going all the way back from school when you need a pencil, just reach out to your backpack.
+
+Ex.
+
+```javascript
+const addTo80 = n => {
+	console.log("long time");
+	return n + 80;
+};
+
+addTo80(5); // long time - 85
+addTo80(5); // long time - 85
+addTo80(5); // long time - 85
+
+let cache = {};
+const memoizedAddTo80 = n => {
+	if (n in cache) return cache[n];
+	console.log("long time");
+	cache[n] = n + 80;
+	return cache[n];
+};
+
+memoizedAddTo80(5); // long time - 85
+memoizedAddTo80(5); // 85
+```
+
+So, **memoization** is a specific type of caching that involves caching tha return value of a function that is the return value of this function based on its parameters. In other words, is using caching to save the result of a function and if the function runs with the same parameter, it won't have to calculate again, it will just return the cached result.
+
+Let's improve the above function a little bit, because we don't want to pollute the global scope, so we will use closures for it.
+
+```javascript
+const memoizedAddTo80 = () => {
+	let cache = {};
+	return function (n) {
+		if (n in cache) return cache[n];
+		console.log("long time");
+		cache[n] = n + 80;
+		return cache[n];
+	};
+};
+
+const memoized = memoizedAddTo80();
+
+memoized(5); // long time - 85
+memoized(5); // 85
+```
+
+#### Compose and Pipe
+
+[Summary](#summary)
+
+**Composition** is the idea that any data transformation that we do should be obvious. Composability is a system design simple. We should create an assembly line: `data --> fn --> data --> fc --> data`
+
+Note. `compose()` doesn't exist in JS yet. But there are a bunch of libraries that has it. One of the best libs to use for FP in JS is [Ramda](https://ramdajs.com/).
+
+Ex.
+
+```javascript
+const compose = (f, g) => num => f(g(num));
+
+const multiplyBy3 = num => num * 3;
+
+const makePositive = num => Math.abs(num);
+
+const multiplyBy3AndAbsolute = compose(multiplyBy3, makePositive);
+
+multiplyBy3AndAbsolute(-50); // 150
+```
+
+**Pipe** is essentially the same thing, but instead of going right to left, it goes left to right.
+
+```javascript
+const pipe = (f, g) => num => g(f(num));
+```
+
+Explaining:
+
+```javascript
+f1(f2(f3(50)));
+compose(f1, f2, f3)(50);
+compose(f3, f2, f1)(50);
+```
+
+#### Arity
+
+[Summary](#summary)
+
+It means the number of arguments a function takes. Ex. the function that receives 2 arguments, had an arity of 2.
+
+The less parameters/arity the better.
+
+### Composition vs inheritance
+
+[Summary](#summary)
+
+**Composition** - what it has.
+
+**Inheritance** - what it is. The main problems with inheritance are:
+
+-   **Tight Coupling** between superclass and subclasses. So any small changes to the superclass will have a rippling effect to all subclasses.
+-   **Fragile Base Class** comes from the tight coupling problem where the superclass becomes fragile to changes, since any small change can have major effects to subclasses
+-   **Hierarchy** - classic gorilla/banana problem, where you just want a banana, but you get a gorilla holding a banana because of the inheritance. Another example is, imagine you create a game with a user class and then you have watcher and character subclasses, then elf subclass inherits from character. Then you want to create a jr elf class that inherits from elf class, but because of the hierarchy, you will receive all the methods the superclasses have, and the jr elf should only have 1 method, sleep.
+
+To fix all these problems with composition, we need first to remove all the methods and create a composition of functions to add to the character object different abilities.
+
+Example:
+
+```javascript
+const getAttackAbility = character =>
+	Object.assign({}, character, { attack: () => `Attack!` });
+
+const Elf = (name, weapon, type) => {
+	let elf = { name, weapon, type };
+	return getAttackAbility(elf);
+};
+```
+
+#### OOP vs FP
+
+[Summary](#summary)
+
+**OOP**
+
+-   few operations on common data
+-   stateful - we modify state
+-   side effects
+-   imperative
+-   Usage: many things, like characters in a game, with not too many operations
+
+**FP**
+
+-   many operations on fixed data
+-   stateless
+-   pure functions
+-   declarative
+-   Usage: good at processing large data for applications. High performance and processors.
