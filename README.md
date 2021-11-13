@@ -51,6 +51,11 @@
       - [Arity](#arity)
     - [Composition vs inheritance](#composition-vs-inheritance)
       - [OOP vs FP](#oop-vs-fp)
+    - [Asynchronous JS](#asynchronous-js)
+      - [How JS Works](#how-js-works)
+      - [Callbacks](#callbacks)
+      - [Promises](#promises)
+      - [Async and Await](#async-and-await)
 
 ### Javascript Engine
 
@@ -1402,3 +1407,100 @@ const Elf = (name, weapon, type) => {
 -   pure functions
 -   declarative
 -   Usage: good at processing large data for applications. High performance and processors.
+
+### Asynchronous JS
+
+[Summary](#summary)
+
+Async means we don't have it right now, so we will request that.
+
+#### How JS Works
+
+[Summary](#summary)
+
+Memory leak happens when we have variables/functions not being used but filling up the memory heap.
+
+JS is a single threaded (only one call stack) language that can be non-blocking. So, in theory, JS is synchronous, it goes line by line.
+Stack overflow is the problem when the call stack literally overflows. There are so many request in the stack that it fills it up.
+
+Other languages, like C#, Java, or Go, are multi threaded which means they have multiple call stacks.
+
+JS Run-Time Environment comes to save the day and help JS to have asynchronous functions.
+
+[JS Runtime Env](images/js-runtime-env.png)
+
+#### Callbacks
+
+[Summary](#summary)
+
+Callback is a function that will be called when something is done. This was a way to use JS async, so when something came back I could call another function.
+
+The problem is the famous callback pyramid of doom. It's like an inceptions of callbacks inside callbacks. Ex.
+
+```javascript
+grabTweets('twitter/xyz', (err, xyzTweets) => {
+    if (err) throw Error;
+    displayTweets(xyzTweets)
+    grabTweets('twitter/abc', (err, abcTweets) => {
+        if (err) throw Error;
+        displayTweets(abcTweets)
+    }
+    grabTweets('twitter/mno', (err, mnoTweets) => {
+        if (err) throw Error;
+        displayTweets(mnoTweets)
+    }
+}
+```
+
+Promises serve for the same purposes as callback, but they are more powerful.
+
+#### Promises
+
+[Summary](#summary)
+
+Is an object that may produce a single value some time in the future, either a resolved value, or a reason that it's not resolved (rejected).
+
+A promised can have 3 types of states:
+
+-   Fulfilled
+-   Rejected
+-   Pending
+
+Ex.
+
+```javascript
+const promise = new Promise((resolved, rejected) => {
+	if (true) resolved("worked");
+	rejected("error");
+});
+
+const promise2 = new Promise((resolved, rejected) => {
+	setTimeout(resolve, 100, "Hi");
+});
+
+const promise3 = new Promise((resolved, rejected) => {
+	setTimeout(resolve, 1000, "Oh");
+});
+
+const promise4 = new Promise((resolved, rejected) => {
+	setTimeout(resolve, 5000, "Ok");
+});
+
+promise
+	.then(result => result + "!")
+	.then(result2 => result2 + "?")
+	.catch(() => console.log("erroooor"))
+	.then(result3 => console.log(result2 + "@")); // worked!?@
+
+// to resolve all promises
+Promise.all([promise, promise2, promise3, promise4]).then(values =>
+	console.log(values)
+); // waits for the 5 seconds to resolve all the promises and returns an array with the values - ['worked', 'hi', 'oh', 'ok']
+
+/* Note. In order for the Promise.all test to work, you need to copy all and paste together in the console, otherwise, from the time you paste only the promises and then copy and paste the Promise.all, all the promises will be resolved already, so it won't take the 5 secs.
+ */
+```
+
+#### Async and Await
+
+[Summary](#summary)
