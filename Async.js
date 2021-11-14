@@ -1,6 +1,6 @@
 // Async in JS
 
-// example 1:
+//! example 1: - SetTimeout is a webapi
 setTimeout(function () {
 	console.log("1", "is the loneliest number");
 }, 0);
@@ -18,22 +18,22 @@ undefined
 2 can be as bad as one
 */
 
-// Promises
+//! Promises
 const promise = new Promise((resolved, rejected) => {
 	if (true) resolved("worked");
 	rejected("error");
 });
 
 const promise2 = new Promise((resolved, rejected) => {
-	setTimeout(resolve, 100, "Hi");
+	setTimeout(resolved, 100, "Hi");
 });
 
 const promise3 = new Promise((resolved, rejected) => {
-	setTimeout(resolve, 1000, "Oh");
+	setTimeout(resolved, 1000, "Oh");
 });
 
 const promise4 = new Promise((resolved, rejected) => {
-	setTimeout(resolve, 5000, "Ok");
+	setTimeout(resolved, 5000, "Ok");
 });
 
 promise
@@ -65,4 +65,100 @@ Promise.all(urls.map(url => fetch(url).then(resp => resp.json())))
 
 // If, by any mistake, there is an error in one of the urls, it will return the error for all. With Promise.all, if one has an error, all will error out.
 
-// Async and Await
+//! Async and Await
+const getUsers = async url => {
+	const response = await fetch(url);
+	const data = await response.json();
+	console.log(data);
+};
+
+const getAll = async urls => {
+	try {
+		const [users, posts, albums] = await Promise.all(
+			urls.map(url => fetch(url).then(resp => resp.json()))
+		);
+		console.log(users);
+		console.log(posts);
+		console.log(albums);
+	} catch (err) {
+		console.log("error: ", err);
+	}
+};
+
+getUsers(urls[0]);
+getAll(urls);
+
+// for await of
+const getData = async urls => {
+	try {
+		const arrayOfPromises = urls.map(url => fetch(url));
+		for await (let request of arrayOfPromises) {
+			const data = await request.json();
+			console.log(data);
+		}
+	} catch (err) {
+		console.log(err);
+	}
+};
+
+//! Parallel, Sequence, Race
+const promisify = (item, delay) =>
+	new Promise(resolve => setTimeout(() => resolve(item), delay));
+
+const a = () => promisify("a", 100);
+const b = () => promisify("a", 1000);
+const c = () => promisify("a", 5000);
+
+// Parallel
+const parallel = async () => {
+	const promises = [a(), b(), c()];
+	const [res1, res2, res3] = await Promise.all(promises);
+	return `parallel is done: ${res1} ${res2} ${res3}`;
+};
+parallel();
+
+// Sequence
+const sequence = async () => {
+	const res1 = await a();
+	const res2 = await b();
+	const res3 = await c();
+	return `sequence is done ${res1} ${res2} ${res3}`;
+};
+sequence();
+
+// Race
+const race = async () => {
+	const promises = [a(), b(), c()];
+	const res1 = await Promise.race(promises);
+	return `race is done: ${res1}`;
+};
+race();
+
+//! Promise.allSettled
+const promise2 = new Promise((resolved, rejected) => {
+	setTimeout(resolved, 100, "Hi");
+});
+
+const promise3 = new Promise((resolved, rejected) => {
+	setTimeout(rejected, 1000, "Oh something is wrong");
+});
+
+Promise.allSettled([promise2, promise3]).then(data => console.log(data));
+
+//! Promise.any
+const p1 = new Promise((resolve, reject) => {
+	setTimeout(() => resolve("A"), 1000);
+});
+const p2 = new Promise((resolve, reject) => {
+	setTimeout(() => resolve("B"), 500);
+});
+const p3 = new Promise((resolve, reject) => {
+	setTimeout(() => resolve("C"), 9000);
+});
+
+const any = async () => await Promise.any([p1, p2, p3]);
+any();
+
+//! Web Worker
+var worker = new Worker("worker.js");
+worker.postMessage("hello world");

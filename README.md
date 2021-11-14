@@ -55,7 +55,13 @@
       - [How JS Works](#how-js-works)
       - [Callbacks](#callbacks)
       - [Promises](#promises)
-      - [Async and Await](#async-and-await)
+      - [Async and Await (ES8)](#async-and-await-es8)
+      - [ES9 (2018)](#es9-2018)
+      - [Job Queue / Microtask Queue](#job-queue--microtask-queue)
+      - [Parallel, Sequence, and Race](#parallel-sequence-and-race)
+      - [Promise.allSettled - ES2020)](#promiseallsettled---es2020)
+      - [Promise.any() - ES2021](#promiseany---es2021)
+      - [Threads, Concurrency, and Parallelism](#threads-concurrency-and-parallelism)
 
 ### Javascript Engine
 
@@ -1475,15 +1481,15 @@ const promise = new Promise((resolved, rejected) => {
 });
 
 const promise2 = new Promise((resolved, rejected) => {
-	setTimeout(resolve, 100, "Hi");
+	setTimeout(resolved, 100, "Hi");
 });
 
 const promise3 = new Promise((resolved, rejected) => {
-	setTimeout(resolve, 1000, "Oh");
+	setTimeout(resolved, 1000, "Oh");
 });
 
 const promise4 = new Promise((resolved, rejected) => {
-	setTimeout(resolve, 5000, "Ok");
+	setTimeout(resolved, 5000, "Ok");
 });
 
 promise
@@ -1501,6 +1507,190 @@ Promise.all([promise, promise2, promise3, promise4]).then(values =>
  */
 ```
 
-#### Async and Await
+#### Async and Await (ES8)
 
 [Summary](#summary)
+
+Built on top of promises. It makes the code easy to read. It makes asynchronous code look synchronous. It is syntactic sugar on top of promises. Example:
+
+```javascript
+async function playerStart() {
+	const firstMove = await movePlayer(100, "left");
+	await movePlayer(200, "up");
+	await movePlayer(500, "right");
+}
+```
+
+#### ES9 (2018)
+
+[Summary](#summary)
+
+**Object Spread Operator**
+
+const animals = {
+tiger: 2,
+lion: 5,
+monkey: 6
+}
+
+const {tiger, ...rest} = animals
+
+**Finally** - allows us to do something "finally" when a promise is finished. No matter if there was successful (resolved) or if there was an error (rejected), finally will always run at the end. Note. finally doesn't receive any parameter.
+
+```javascript
+const myPromise = new promise((resolve, reject) => {
+	setTimeout(resolve, 100, "Hi");
+})
+	.then(() => console.log("How are you?"))
+	.catch(err => console.log(err))
+	.finally(() => console.log("All done!"));
+```
+
+**For Await Of** - allows us to loop through over the await functions in case we have more than one.
+
+```javascript
+// for of
+const loopThroughUrls = urls => {
+	for (url of urls) {
+		console.log(urls);
+	}
+};
+
+// for await of
+const getData = async urls => {
+	try {
+		const arrayOfPromises = urls.map(url => fetch(url));
+		for await (let request of arrayOfPromises) {
+			const data = await request.json();
+			console.log(data);
+		}
+	} catch (err) {
+		console.log(err);
+	}
+};
+```
+
+#### Job Queue / Microtask Queue
+
+[Summary](#summary)
+
+This is a smaller queue created for promises. And it has higher priority over the callback queue. So, the event loop will first look at the job queue and then look at the callback queue.
+
+![Job Queue](images/jobq.png)
+
+Because this is a browser implementation we might have some legacy browsers that implements this differently on don't even have this. So be careful.
+
+#### Parallel, Sequence, and Race
+
+[Summary](#summary)
+
+3 ways we might want to run our promises.
+
+-   Parallel - run in parallel, all the same time. Use `Promise.all()`.
+
+```javascript
+const parallel = async () => {
+	const promises = [a(), b(), c()];
+	const [res1, res2, res3] = await Promise.all(promises);
+	return `parallel is done: ${res1} ${res2} ${res3}`;
+};
+parallel();
+```
+
+-   Sequencial - run in a sequence, so only runs the next when finish the previous. Use `await`.
+
+```javascript
+const sequence = async () => {
+	const res1 = await a();
+	const res2 = await b();
+	const res3 = await c();
+	return `sequence is done ${res1} ${res2} ${res3}`;
+};
+sequence();
+```
+
+-   Race - returns the first promise ended. Use `Promise.race()`.
+
+```javascript
+const race = async () => {
+	const promises = [a(), b(), c()];
+	const res1 = await Promise.race(promises);
+	return `race is done: ${res1}`;
+};
+race();
+```
+
+If we call all 3 the responses will be in the following order:
+
+-   race
+-   parallel
+-   sequence
+
+#### Promise.allSettled - ES2020)
+
+[Summary](#summary)
+
+Doesn't care about resolved or rejected. `Promise.allSettled` will return an array of promises returns with the status (fulfilled or rejected) and the value/reason.
+
+So, unlike `Promise.all` that would only return if both promises resolved, the `Promise.allSettled` will return even if one promise is rejected.
+
+Ex.
+
+```javascript
+const promise2 = new Promise((resolved, rejected) => {
+	setTimeout(resolved, 100, "Hi");
+});
+
+const promise3 = new Promise((resolved, rejected) => {
+	setTimeout(rejected, 1000, "Oh something is wrong");
+});
+
+Promise.allSettled([promise2, promise3]).then(data => console.log(data));
+```
+
+![Promise.allSettled](./images/p-allSettled.png)
+
+#### Promise.any() - ES2021
+
+[Summary](#summary)
+
+This new method will resolve whenever any of the supplied promises is resolved. If none of the promises resolves, it will throw an error.
+
+```javascript
+const p1 = new Promise((resolve, reject) => {
+	setTimeout(() => resolve("A"), 1000);
+});
+const p2 = new Promise((resolve, reject) => {
+	setTimeout(() => resolve("B"), 500);
+});
+const p3 = new Promise((resolve, reject) => {
+	setTimeout(() => resolve("C"), 9000);
+});
+
+const any = async () => await Promise.any([p1, p2, p3]);
+any();
+```
+
+![Promise.any](images/p-any.png)
+
+#### Threads, Concurrency, and Parallelism
+
+[Summary](#summary)
+
+Node.js became popular because it can run multiple threads because of something called worker threads in its runtime.
+
+![node.js runtime](images/node-runtime.png)
+
+And in the browser we also have this idea o web worker. And a web worker is simply a js program running on a different thread in parallel to our main thread.
+
+In order to use, create a `new Worker`.
+
+The webworker communicate through sending/receiving messages. But keep in mind they do not have access to all the browser web apis, like window or document objects.
+
+**Concurrency vs Parallelism**
+
+-   Concurrency - single-core CPU. So the engine will go to one task, run it, then go to the second, then if it needs, go back to the first. So only one runs. This we can achieve with JS.
+
+-   Parallelism - multi-core CPU. More than one task runs at the same time. This we cannot achieve with plain JS. But we can achieve it using Node.js spawn new child_process, for example.
+
+![Concurrency vs Parallelism](images/conc-paral.png)
