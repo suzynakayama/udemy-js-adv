@@ -62,6 +62,23 @@
       - [Promise.allSettled - ES2020)](#promiseallsettled---es2020)
       - [Promise.any() - ES2021](#promiseany---es2021)
       - [Threads, Concurrency, and Parallelism](#threads-concurrency-and-parallelism)
+    - [Modules in JS](#modules-in-js)
+      - [Module Pattern](#module-pattern)
+      - [CommonJS, AMD, and UMD](#commonjs-amd-and-umd)
+      - [Native Module - ES6](#native-module---es6)
+    - [Error Handling](#error-handling)
+      - [Extending Errors](#extending-errors)
+  - [Intermediate JS](#intermediate-js)
+    - [ES5 & ES6](#es5--es6)
+      - [Let and Const](#let-and-const)
+      - [Advanced Arrays](#advanced-arrays)
+      - [Advanced objects](#advanced-objects)
+    - [ES7(2016)](#es72016)
+    - [ES8(2017)](#es82017)
+    - [ES8 and ES9(2018)](#es8-and-es92018)
+    - [ES10(2019)](#es102019)
+    - [Advanced Loops](#advanced-loops)
+    - [ES2020](#es2020)
 
 ### Javascript Engine
 
@@ -1694,3 +1711,523 @@ The webworker communicate through sending/receiving messages. But keep in mind t
 -   Parallelism - multi-core CPU. More than one task runs at the same time. This we cannot achieve with plain JS. But we can achieve it using Node.js spawn new child_process, for example.
 
 ![Concurrency vs Parallelism](images/conc-paral.png)
+
+### Modules in JS
+
+[Summary](#summary)
+
+Modules are pieces of code grouped together into a single module that can be used and combined to create a bigger application. Good modules are highly self-contained.
+
+Modules is a way to contain and create a new scope for variables. So we will not have problems with the same variables in different libraries or scripts.
+
+#### Module Pattern
+
+[Summary](#summary)
+
+The old way of creating modules in JS.
+
+-   Global Scope
+    -   Module Scope - using module pattern
+        -   Function Scope
+            -   Block Scope - let and const
+
+Using IIFE we create a new scope, so this is the idea of the module pattern. Within an IIFE we can have out local variables, but also have access to global variables.
+So whatever the return of the IIFE we set to a variable. This way we crate a module for people to use it.
+
+```javascript
+// IIFE
+// Module Pattern
+var fightModule = (function () {
+	var harry = "potter";
+	var voldemort = "He who must not be named";
+
+	function fight(char1, char2) {
+		var attack1 = Math.floor(Math.random() * char1.length);
+		var attack2 = Math.floor(Math.random() * char2.length);
+		return attack1 > attack2 ? `${char1} wins` : `${char2} wins`;
+	}
+
+	return { fight };
+})();
+```
+
+jQuery is one example of a module.
+
+2 Main Problems:
+
+-   We are still polluting the global scope, even thought it is less, we are still doing it. In the example above, for example, we are polluting with the variable `fight`.
+-   We need to make sure we are calling the scripts in order, otherwise there will be no such variable to be used.
+
+#### CommonJS, AMD, and UMD
+
+[Summary](#summary)
+
+CommonJS and AMD (Asynchronous Module Definition) came to help with the problems.
+
+**CommonJS** helps us with an easy way to import the modules:
+
+```javascript
+var mod1 = require('module1');
+// importing specific functions
+var mod2 = require('module2').fight;
+
+// or if we are creating a module and want to export the function:
+function fight() {...}
+module.exports = {fight}
+```
+
+The CommonJS is still used by Node.js.
+
+Browserify - lets you require modules in the browser by bundling up all of your dependencies.
+
+**AMD** it was designed specifically for browsers, so it will load asynchronously.
+
+```javascript
+define([mod1, mod2], function(mod1Import, mod2Import) {
+    var mod1 = mod1Import
+    var mod2 = mod2Import
+
+    function dance() {...}
+
+    return {dance}
+})
+```
+
+Require.js is the lib that used AMD.
+
+**UMD** is Universal Module Definition.
+
+#### Native Module - ES6
+
+[Summary](#summary)
+
+Now we have native module, we use `import X from Y` and `export` or `export default`.
+
+```javascript
+const harry = "potter";
+const voldemort = "He who must not be named";
+
+export function fight(char1, char2) {
+	const attack1 = Math.floor(Math.random() * char1.length);
+	const attack2 = Math.floor(Math.random() * char2.length);
+	return attack1 > attack2 ? `${char1} wins` : `${char2} wins`;
+}
+
+// so whenever I want to use my module I can:
+import { fight } from "my-module";
+
+// or if I export default I can just import without the {}
+export default function fight() {}
+
+import fight from "my-module";
+```
+
+Important to make this work:
+
+-   define the script as a `type='module'` within the HTML:
+
+    ```html
+    <script type="module">
+    	import fight from "./my-script.js";
+    	console.log(fight("ron", "hedwig"));
+    </script>
+    ```
+
+-   you will need something like 'live-server' working on the background, so we can serve the module.
+
+### Error Handling
+
+[Summary](#summary)
+
+In JS we have a native Error constructor function: `Error`. And we can create new instances by calling `new Error('error')`.
+
+In JS we have the throw keyword for throwing errors: `throw new Error()`.
+
+The error has 3 properties:
+
+-   name
+-   message
+-   stack - is the stack trace, that shows us where the error happened
+
+JS has many built-in constructor for errors, some examples:
+
+-   new SyntaxError
+-   new ReferenceError
+
+If we do not have a catch in our program to catch the errors, eventually it will get to the runtime. The runtime has a catch: `onerror()` - in js and `process.on('uncaughtException')` - in node.
+
+The power of the errors is being able to add a catch to be able to resolve the way we want and continue running our program.
+
+We can use:
+
+-   try/catch block - can be used to get any type of synchronous exceptions.
+
+```javascript
+function fail() {
+	try {
+		conso.log("works"); // misspelled console
+	} catch (err) {
+		console.log("error", err);
+	} finally {
+		console.log("I always run");
+	}
+}
+
+// async code - try/catch block doesn't catch the error
+try {
+	setTimeout(() => unknownVariable, 1000);
+} catch (e) {
+	console.log("error", e);
+}
+```
+
+-   catch() method - better way to catch errors on asynchronous code
+
+```javascript
+// promises
+Promise.resolve("async fail")
+	.then(res => throw new Error("fail")) // if we don't add the catch, we have a silently fail. So we never get the errors and our program just fails
+	.catch(err => console.log(err));
+
+// async/await => we can use try/catch blocks here
+const failFunc = async () => {
+	try {
+		conso.log("works"); // misspelled console
+	} catch (err) {
+		console.log("error", err);
+	} finally {
+		console.log("I always run");
+	}
+	console.log("this will run too");
+};
+```
+
+#### Extending Errors
+
+[Summary](#summary)
+
+Since the Error constructor is an object, we can extend it.
+
+```javascript
+class authError extends Error {
+	constructor(message) {
+		super(message);
+		this.name = "authError";
+		this.useless = "yay";
+	}
+}
+
+throw new authError("oops");
+a = new authError("oh no");
+a.useless;
+```
+
+## Intermediate JS
+
+[Summary](#summary)
+
+### ES5 & ES6
+
+[Summary](#summary)
+
+#### Let and Const
+
+[Summary](#summary)
+
+**Let** and **Const** allows us to create a scope within a block of code.
+
+**Const** means constant, so it is a variable that cannot be reassigned. Note. we can still change the properties of a const object, we just cannot reassign it.
+
+Declaring **Object Properties** - now we can have dynamic properties:
+
+```javascript
+const name = "John Smith";
+const obj = {
+	[name]: "The Second",
+	[1 + 2]: "is three",
+};
+
+const a = "ok";
+const b = true;
+
+const obj1 = {
+	a,
+	b,
+};
+```
+
+**Template Strings** use backticks, dollar sign and curly braces: Ex.
+
+```javascript
+const name = "Ella";
+console.log(`Hello ${name}!`);
+```
+
+**Default Arguments** for functions. Ex.
+
+```javascript
+const greet = (name = "John Doe", age = "30") =>
+	`Hello! My name is ${name} and I am ${age}.`;
+greet(); // Hello! My name is John Does and I am 30.
+```
+
+New type **Symbol** - is a completely unique type, they are used so there will never be any conflict.
+
+```javascript
+let sym1 = Symbol();
+let sym2 = Symbol("Foo");
+let sym3 = Symbol("Foo");
+
+console.log(sym2 === sym3); // false
+```
+
+And **Arrow Functions** also came with ES6.
+
+```javascript
+const add = (a, b) => a + b;
+```
+
+#### Advanced Arrays
+
+[Summary](#summary)
+
+**Map** goes through each item in array and returns an array with the result of the interaction.
+
+```javascript
+const arr = [1, 2, 3, 4];
+const mapArr = arr.map(num => num * 2);
+console.log(mapArr); // [2,4,6,8]
+```
+
+**Filter** goes through each item until it finds the elements we want to filter and return an array with the results.
+
+```javascript
+const filterArr = arr.filter(num => num >= 3);
+console.log(filterArr); // [3,4]
+```
+
+**Reduce** will receive an accumulator (second argument) and the item of the array and return the interaction result.
+
+```javascript
+const reduceArr = arr.reduce((acc, num) => acc + num, 0);
+console.log(reduceArr); // 9
+```
+
+#### Advanced objects
+
+[Summary](#summary)
+
+**Reference Type** - is a non-primitive type. They are created by the programmer.
+
+```javascript
+let obj1 = { val: 10 };
+let obj2 = obj1;
+let obj3 = { val: 10 };
+console.log(obj1 === obj2); // true
+console.log(obj1 === obj3); // false
+```
+
+In the example above, obj1 was save in a memory space, let's say `a`. And then we created obj2 and pointed to obj1, so obj2 is pointed to the same memory space `a`. Then obj3 was created and saved in memory space `b`. That is why, even though the values are the same, obj1 is different from obj3.
+
+**Context** - tell us where we are within the object. Context refers to an object. Within an object, the keyword `this` refers to that object (ex. self) and provides an interface to the properties and methods that are members of that object.
+
+```javascript
+const a = () => console.log(this);
+a(); // window
+const obj = {
+	a: () => console.log(this),
+};
+obj.a(); // {a:f} - it's the object
+```
+
+**Instantiation** - when you instantiate the object.
+
+### ES7(2016)
+
+[Summary](#summary)
+
+**.includes() method**
+
+Check if something is within the object.
+
+```javascript
+"hello"
+	.includes("o") // true
+	[(1, 2, 3)].includes(2); // true
+```
+
+**exponential operator**
+
+```javascript
+const square = num => num ** 2;
+square(2); // 4
+```
+
+### ES8(2017)
+
+[Summary](#summary)
+
+**String Padding**
+
+```javascript
+"Turtle".padStart(5); // ads 5 spaces in front of Turtle
+"Turtle".padEnd(5); // ads 5 spaces in the end of Turtle
+```
+
+**Trailing Commas** will not brake the program.
+
+```javascript
+const fun = (a, b, c) => console.log(a);
+fun(2, 3, 4);
+```
+
+**Object.values and Object.entries**
+Before we had Object.keys
+
+```javascript
+let obj = {
+	user0: "Santa",
+	user1: "Rudolf",
+	user2: "Grinch",
+};
+
+Object.Keys(obj); //  returns array of the keys [user0, user1, user2]
+Object.values(obj); // returns array with the values [Santa, Rudolf, Grinch]
+Object.entries(obj); // returns array with arrays for each key-value pair [[user0, Santa], [user1, Rudolf], [user2, Grinch]]
+```
+
+### ES8 and ES9(2018)
+
+[Summary](#summary)
+
+Async and Await [already introduced above](#async-and-await-es8).
+
+### ES10(2019)
+
+[Summary](#summary)
+
+**Flat() method** for flatting arrays. If you don't give any argument, it will flat once. But you can give how many layers you want to flat. You can even use a very big number, like 50 or even use `Infinity`.
+
+```javascript
+const arr = [1, [2, [3]]];
+arr.flat(2); // [1,2,3]
+```
+
+**FlatMap() method** allows us to use the flat and map methods together. So it will flat with the depth of 1, like flat, and iterate over each item and return an array, like map.
+
+```javascript
+const arr = [1, [2, [3]]];
+arr.flatMap(num => num * 2); // [2, 4, [6]]
+```
+
+**trimStart() and trimEnd()** will clean up the extra spaces at the start or end of the string.
+
+```javascript
+const crazyStr = "    ok";
+const crazyStr2 = "ok    ";
+crazyStr.trimStart(); // ok
+crazyStr2.trimEnd(); // ok
+```
+
+**fromEntries() method** will receive an array of arrays and transform into an object.
+
+```javascript
+const users = [
+	["Joe", 30],
+	["Jane", 29],
+];
+Object.fromEntries(users); // { Joe: 30, Jane: 29 }
+```
+
+**Try/Catch** without adding the error to catch.
+
+```javascript
+try {
+	//something
+} catch {
+	// something
+}
+```
+
+### Advanced Loops
+
+[Summary](#summary)
+
+**For Of Loop** - for iterating over iterables (string, arrays)
+
+```javascript
+const basket = ["apple", "bananas", "grapes"];
+
+for (item of basket) {
+	console.log(item);
+}
+```
+
+**For In Loop** - for enumerating over enumerables (objects). It will loop over the object properties.
+
+```javascript
+const detailedBasket = {
+	apples: 5,
+	bananas: 2,
+	grapes: 100,
+};
+
+for (item in detailedBasket) {
+	console.log(item);
+}
+```
+
+_Note. If we use the `for in` with iterables, it will return the indexes._
+
+### ES2020
+
+[Summary](#summary)
+
+**BigInt** is a new type in JS. It means a really big number. Add `n` to the number. Because of the `MAX_SAFE_INTEGER`, we have a maximum number, so we need bigInt when we use a number bigger than the `MAX_SAFE_INTEGER`.
+
+```javascript
+const big = 1n;
+const sum = 1n + 2n;
+```
+
+**Nullish Coalescing Operator (??)** - replace the `||` operator. Diferently from the `||` operator, the nulish coalescing operator checks if the value is null or undefined. So, if the value is falsy (false, empty string), it will still return the value, instead of returning the second option.
+
+```javascript
+let adam = {
+	raichu: {
+		species: "pokemon",
+		height: 0.8,
+		weight: 30,
+		power: "lightning",
+		force: false,
+	},
+};
+
+// before
+let power = adam?.raichu?.power || "no power"; // lightning
+let force = adam?.raichu?.force || "no force"; // no force
+let force = adam?.raichu?.force ?? "no force"; // false
+```
+
+**Optional Chaining Operatos (?.)** - replace the if statement to check if an object has the propertie object that we want something from. If the object doesn't exist, it will return undefined.
+
+```javascript
+let will = {
+	pikachu: {
+		species: "pokemon",
+		height: 0.4,
+		weight: 6,
+	},
+};
+
+let adam = {
+	raichu: {
+		species: "pokemon",
+		height: 0.8,
+		weight: 30,
+	},
+};
+
+let weight = will.pikachu.weight;
+let weight2 = adam?.pikachu?.weight;
+```
