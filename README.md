@@ -79,6 +79,9 @@
     - [ES10(2019)](#es102019)
     - [Advanced Loops](#advanced-loops)
     - [ES2020](#es2020)
+    - [ES2021](#es2021)
+    - [Debugging](#debugging)
+    - [Modules](#modules)
 
 ### Javascript Engine
 
@@ -2231,3 +2234,46 @@ let adam = {
 let weight = will.pikachu.weight;
 let weight2 = adam?.pikachu?.weight;
 ```
+
+**GlobalThis** - is pretty much the window object in the browser. The difference is that it works outside the browser. For ex. if we use `globalThis` in node we will see node's window object (which is called global).
+
+### ES2021
+
+[Summary](#summary)
+
+**replaceAll()** for strings. It will replace all the instances of the chosen word in the string.
+
+```javascript
+let str = "my best string, my beautiful string";
+str.replaceAll("my", "your"); // 'your best string, your beautiful string'
+```
+
+### Debugging
+
+[Summary](#summary)
+
+`debugger` keyword will open the debugger in the window and you can debug the code going line by line.
+
+```javascript
+const flattened = [
+	[0, 1],
+	[2, 3],
+	[4, 5],
+].reduce((a, b) => {
+	debugger;
+	a.concat(b);
+}, []);
+flattened(); // [0, 1, 2, 3, 4, 5]
+```
+
+### Modules
+
+[Summary](#summary)
+
+Before to Now:
+
+1. script tag with all the js in html - problem: polluting the window object
+2. script tag tagging a js file - problem: lack dependency resolution (need to be careful which file is tagged first), also polluting the window object, and lots of copy/paste to use in other html file
+3. IIFE - You don't pollute the global namespace. problem: lack dependency resolution
+4. Browserify - it uses Common.js to create a bundle all js files together into a single file.
+5. Webpack + ES6 - ES6 brought [Modules](#modules-in-js) into JS. And now we can create modules. With Webpack we can bundle all together and use within the different browsers.
